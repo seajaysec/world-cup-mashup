@@ -1,10 +1,19 @@
-import type { RosterEntry, TeamProgress } from '../../types'
+import type { GroupRecord, RosterEntry, Tier, TeamProgress } from '../../types'
 import type { LeaderboardEntry } from '../../lib/leaderboard'
 import type { JokeProgress } from '../../lib/joke'
 import { ROSTER } from '../../data/roster'
-import { getTeamMeta, TEAMS } from '../../data/teams'
+import { getTeamMeta, TEAMS, TIER_LABELS, TIER_RANGE_LABELS } from '../../data/teams'
 import { StatusBadge, TierBadge } from '../Badges'
 import styles from '../../styles/app.module.css'
+
+const TIER_ORDER: Tier[] = ['favorite', 'contender', 'darkhorse', 'longshot']
+
+/** "1 pt · −8 GD · 1 GF" — the group-stage tiebreakers, shown so the ordering
+ * (and the wooden spoon) is self-explanatory. */
+function groupStatLine(rec: GroupRecord): string {
+  const gd = rec.goalDiff > 0 ? `+${rec.goalDiff}` : `${rec.goalDiff}`
+  return `${rec.points} pt${rec.points === 1 ? '' : 's'} · ${gd} GD · ${rec.goalsFor} GF`
+}
 
 function rowClasses(entry: LeaderboardEntry, mine: boolean): string {
   const classes = [styles.lbRow]
@@ -48,6 +57,16 @@ export function LeaderboardView({
         difference, then goals scored. Only the current last-place real team holds the 🥄 — it moves
         as teams go out. The ✨ exhibition sides play their own game.
       </p>
+      <p className={styles.tierLegend}>
+        Favoredness ={' '}
+        {TIER_ORDER.map((t, i) => (
+          <span key={t}>
+            {i > 0 && ' · '}
+            <strong>{TIER_LABELS[t]}</strong> {TIER_RANGE_LABELS[t]}
+          </span>
+        ))}{' '}
+        to win it all.
+      </p>
 
       <ol className={styles.lbList} style={{ listStyle: 'none', margin: 0, padding: 0 }}>
         {leaderboard.map((entry) => {
@@ -70,11 +89,14 @@ export function LeaderboardView({
                 <div className={styles.lbTeam}>
                   {entry.roster.team}
                   {meta ? (
-                    <TierBadge tier={meta.tier} />
+                    <TierBadge tier={meta.tier} odds={meta.odds} />
                   ) : (
                     joke && <TierBadge tier={joke.tier} />
                   )}
                 </div>
+                {entry.progress.status === 'out' && entry.progress.groupRecord && (
+                  <div className={styles.lbStat}>{groupStatLine(entry.progress.groupRecord)}</div>
+                )}
               </span>
               <span className={styles.lbRight}>
                 {joke ? (
@@ -104,8 +126,10 @@ export function LeaderboardView({
         <>
           <h2 className={styles.sectionTitle}>Knocked out — time to re-pick ({needNewTeam.length})</h2>
           <p className={styles.muted} style={{ fontSize: '0.85rem', marginTop: 0 }}>
-            These teams are out. Their owners can pencil in a replacement on the <strong>My Team</strong>{' '}
-            tab — then 📩 contact Chris to make it official.
+            Out and ordered best → worst, so the bottom one holds the 🥄. The tiebreaker is
+            group-stage record — points, then goal difference, then goals for (shown below each).
+            Owners can pencil in a replacement on the <strong>My Team</strong> tab, then 📩 contact
+            Chris to make it official.
           </p>
           <ul className={styles.matchList} style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {needNewTeam.map((e) => (
@@ -114,8 +138,14 @@ export function LeaderboardView({
                   {e.roster.flag}
                 </span>
                 <span className={styles.lbWho}>
-                  <div className={styles.lbMember}>{e.roster.member}</div>
+                  <div className={styles.lbMember}>
+                    {e.isWoodenSpoon && '🥄 '}
+                    {e.roster.member}
+                  </div>
                   <div className={styles.lbTeam}>{e.roster.team} — knocked out</div>
+                  {e.progress.groupRecord && (
+                    <div className={styles.lbStat}>{groupStatLine(e.progress.groupRecord)}</div>
+                  )}
                 </span>
                 <span className={`${styles.badge} ${styles.statusOut}`}>Needs a team</span>
               </li>
@@ -136,7 +166,7 @@ export function LeaderboardView({
             <span className={styles.availableChip} key={team.name}>
               <span aria-hidden>{team.flag}</span>
               {team.name}
-              <TierBadge tier={team.tier} />
+              <TierBadge tier={team.tier} odds={team.odds} />
             </span>
           ))
         )}

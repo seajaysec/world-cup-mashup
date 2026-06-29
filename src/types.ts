@@ -46,6 +46,9 @@ export interface TeamMeta {
   name: string
   flag: string
   group: string
+  /** Curated pre-tournament title-win odds, in percent. Single source of truth. */
+  odds: number
+  /** Favoredness band, derived from `odds`. */
   tier: Tier
 }
 

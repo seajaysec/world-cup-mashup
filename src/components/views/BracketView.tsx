@@ -4,7 +4,7 @@ import { canonicalTeamName, getTeamMeta } from '../../data/teams'
 import { formatKickoff, parseKickoff } from '../../lib/format'
 import { happyIcon, sadIcon } from '../../lib/icons'
 import { buildSlotResolver, computeGroupTables, type Slot } from '../../lib/bracket'
-import { OwnerChip } from '../Badges'
+import { FavorMark, OwnerChip } from '../Badges'
 import styles from '../../styles/app.module.css'
 
 // Top → bottom: the trophy first, the opening round last.
@@ -95,6 +95,7 @@ function KoSlot({
         {getTeamMeta(team)?.flag ?? '·'}
       </span>
       <span className={styles.koName}>{team}</span>
+      <FavorMark team={team} />
       {owner && <OwnerChip member={owner.member} flag={owner.flag} />}
       {mood && (
         <span aria-hidden className={styles.koMood}>
@@ -120,8 +121,19 @@ function GroupStage({
   onToggle: () => void
 }) {
   const tables = useMemo(() => computeGroupTables(matches), [matches])
+  const summary = useMemo(() => {
+    const groupGames = matches.filter((m) => m.group)
+    const played = groupGames.filter((m) => m.score?.ft).length
+    const dates = groupGames.map((m) => m.date).filter(Boolean).sort()
+    const fmt = (d: string) =>
+      new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', timeZone: 'UTC' }).format(
+        new Date(`${d}T00:00:00Z`),
+      )
+    const range = dates.length ? `${fmt(dates[0])} – ${fmt(dates[dates.length - 1])}` : ''
+    return { played, total: groupGames.length, range }
+  }, [matches])
+
   if (tables.length === 0) return null
-  const complete = tables.every((t) => t.rows.every((r) => r.record.played >= 3))
 
   return (
     <div className={styles.koRound}>
@@ -129,8 +141,13 @@ function GroupStage({
         <span className={styles.koChevron} aria-hidden>
           {open ? '▾' : '▸'}
         </span>
-        <span className={styles.koRoundLabel}>Group stage</span>
-        <span className={styles.koRoundCount}>{complete ? 'complete' : 'in progress'}</span>
+        <span className={styles.koRoundLabel}>
+          Group stage
+          {summary.range && <span className={styles.koRoundDates}> · {summary.range}</span>}
+        </span>
+        <span className={styles.koRoundCount}>
+          {summary.played}/{summary.total} played
+        </span>
       </button>
       {open && (
         <div className={styles.groupGrid}>
@@ -153,6 +170,7 @@ function GroupStage({
                       {row.team}
                       {owner && <span className={styles.groupOwner}> · {owner.member}</span>}
                     </span>
+                    <FavorMark team={row.team} />
                     <span className={styles.groupPts}>{row.record.points}</span>
                   </div>
                 )

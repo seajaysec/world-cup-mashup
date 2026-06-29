@@ -187,7 +187,7 @@ export function MyTeamView({
         </div>
         <div className={styles.heroBadges}>
           <StatusBadge status={progress.status} />
-          {meta && <TierBadge tier={meta.tier} />}
+          {meta && <TierBadge tier={meta.tier} odds={meta.odds} />}
         </div>
         <p className={styles.muted}>{progress.standingLabel}</p>
       </div>

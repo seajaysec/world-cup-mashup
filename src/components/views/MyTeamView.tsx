@@ -217,12 +217,13 @@ export function MyTeamView({
         <p className={styles.muted}>{progress.standingLabel}</p>
         {live && (
           <p className={styles.lbStat}>
-            {formatOdds(live.odds)} to win it all · was {formatOdds(live.priorOdds)} before kickoff
+            🏆 {formatOdds(live.odds)} chance to win the tournament · was{' '}
+            {formatOdds(live.priorOdds)} before kickoff
           </p>
         )}
         {!live && meta && progress.status === 'out' && (
           <p className={styles.lbStat}>
-            Pre-tournament: {TIER_LABELS[meta.tier]} · {formatOdds(meta.odds)} to win it all
+            Pre-tournament: {TIER_LABELS[meta.tier]} · 🏆 {formatOdds(meta.odds)} to win the tournament
           </p>
         )}
       </div>

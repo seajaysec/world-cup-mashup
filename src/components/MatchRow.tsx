@@ -29,9 +29,13 @@ function MatchSide({ team, side, isWinner, owners }: SideProps) {
         {side === 'left' && <span aria-hidden>{placeholder ? '·' : flagFor(team)}</span>}
         <span className={styles.nm}>{name}</span>
         {side === 'right' && <span aria-hidden>{placeholder ? '·' : flagFor(team)}</span>}
-        {!placeholder && <FavorMark team={team} />}
       </div>
-      {owner && <OwnerChip member={owner.member} flag={owner.flag} />}
+      {(owner || !placeholder) && (
+        <div className={styles.matchSideMeta}>
+          {owner && <OwnerChip member={owner.member} flag={owner.flag} />}
+          {!placeholder && <FavorMark team={team} />}
+        </div>
+      )}
     </div>
   )
 }

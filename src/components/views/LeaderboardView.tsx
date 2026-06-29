@@ -61,14 +61,14 @@ export function LeaderboardView({
         as teams go out. The ✨ exhibition sides play their own game.
       </p>
       <p className={styles.tierLegend}>
-        Favoredness ={' '}
+        Every 🏆 % is the same thing: the live chance to win the whole tournament.{' '}
         {TIER_ORDER.map((t, i) => (
           <span key={t}>
             {i > 0 && ' · '}
             <strong>{TIER_LABELS[t]}</strong> {TIER_RANGE_LABELS[t]}
           </span>
-        ))}{' '}
-        to win it all.
+        ))}
+        . <a href="#how-it-works">How it&apos;s calculated →</a>
       </p>
 
       <ol className={styles.lbList} style={{ listStyle: 'none', margin: 0, padding: 0 }}>

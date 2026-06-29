@@ -28,21 +28,27 @@ const TIER_CLASS: Record<Tier, string> = {
   longshot: styles.tierLongshot,
 }
 
-/** Tier label, optionally with the quantified odds, e.g. "Favorite · 14%". */
+/**
+ * Tier label with the quantified title-win odds, e.g. "Favorite · 🏆 14%".
+ * The 🏆 makes clear this is the chance to win the whole tournament — not a match.
+ */
 export function TierBadge({ tier, odds }: { tier: Tier; odds?: number }) {
-  const title = odds != null ? `${TIER_LABELS[tier]} — ${formatOdds(odds)} to win it all` : 'Pre-tournament favoredness'
+  const title =
+    odds != null
+      ? `${TIER_LABELS[tier]} — ${formatOdds(odds)} chance to win the tournament`
+      : 'Favoredness to win the tournament'
   return (
     <span className={`${styles.badge} ${styles.tier} ${TIER_CLASS[tier]}`} title={title}>
       {TIER_LABELS[tier]}
-      {odds != null && <span className={styles.tierOdds}> · {formatOdds(odds)}</span>}
+      {odds != null && <span className={styles.tierOdds}> · 🏆 {formatOdds(odds)}</span>}
     </span>
   )
 }
 
 /**
  * Compact, LIVE favoredness mark for dense rows (schedule, bracket): the current
- * title-win odds, coloured by tier. Renders nothing for unknown/placeholder teams
- * or teams that can no longer win it (0%).
+ * title-win odds, coloured by tier, prefixed with 🏆 so it can't be mistaken for
+ * match odds. Renders nothing for placeholder/eliminated teams (0%).
  */
 export function FavorMark({ team }: { team: string }) {
   const favor = useFavor()
@@ -51,9 +57,9 @@ export function FavorMark({ team }: { team: string }) {
   return (
     <span
       className={`${styles.favorMark} ${TIER_CLASS[info.tier]}`}
-      title={`${TIER_LABELS[info.tier]} — ${formatOdds(info.odds)} to win it all (pre-tournament ${formatOdds(info.priorOdds)})`}
+      title={`${formatOdds(info.odds)} chance to win the tournament (pre-tournament ${formatOdds(info.priorOdds)})`}
     >
-      {formatOdds(info.odds)}
+      🏆 {formatOdds(info.odds)}
     </span>
   )
 }

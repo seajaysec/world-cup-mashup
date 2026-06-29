@@ -341,6 +341,15 @@
   min-width: 0;
   max-width: 100%;
 }
+.matchSideMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  flex-wrap: wrap;
+}
+.matchSide.right .matchSideMeta {
+  justify-content: flex-end;
+}
 .matchSide.win {
   font-weight: 700;
 }
@@ -482,6 +491,32 @@
 .muted {
   color: var(--color-text-muted);
 }
+.aboutLink {
+  white-space: nowrap;
+}
+.about {
+  line-height: 1.55;
+}
+.about p {
+  color: var(--color-text-muted);
+}
+.aboutTitle {
+  font-size: 1.5rem;
+  margin: var(--space-2) 0 var(--space-3);
+}
+.about h2 {
+  margin-top: var(--space-5);
+}
+.aboutList {
+  color: var(--color-text-muted);
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.aboutList strong {
+  color: var(--color-text);
+}
 .center {
   text-align: center;
   padding: var(--space-6) var(--space-4);
@@ -621,6 +656,26 @@
   letter-spacing: 0.05em;
   color: var(--color-text-faint);
   margin-bottom: 0.2rem;
+  font-weight: 700;
+}
+.statusDone {
+  color: var(--color-alive);
+}
+.statusToday {
+  color: var(--color-out);
+}
+.statusSoon {
+  color: var(--color-info);
+}
+.statusWait {
+  color: var(--color-accent);
+}
+.koRoundSub {
+  font-weight: 400;
+  font-size: 0.74rem;
+  color: var(--color-text-faint);
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 /* ---- Group-stage tables in the bracket ---------------------------------- */

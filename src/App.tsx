@@ -17,7 +17,10 @@ import { MyTeamView } from './components/views/MyTeamView'
 import { LeaderboardView } from './components/views/LeaderboardView'
 import { BracketView } from './components/views/BracketView'
 import { ScheduleView } from './components/views/ScheduleView'
+import { AboutView } from './components/views/AboutView'
 import styles from './styles/app.module.css'
+
+const ABOUT_HASH = '#how-it-works'
 
 function feedNote(loaded: LoadedFeed): string {
   switch (loaded.source) {
@@ -36,14 +39,42 @@ export function App() {
   const [tab, setTab] = useState<TabKey>('me')
   const [claimedMember, setClaim] = useState<string | null>(() => getClaimedMember())
   const [repicks, setRepicks] = useState<Record<string, string>>(() => getRepicks())
+  const [showAbout, setShowAbout] = useState(
+    () => typeof window !== 'undefined' && window.location.hash === ABOUT_HASH,
+  )
+
+  useEffect(() => {
+    const onHash = () => setShowAbout(window.location.hash === ABOUT_HASH)
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
+
+  const closeAbout = () => {
+    if (window.location.hash) window.location.hash = ''
+    setShowAbout(false)
+  }
 
   useEffect(() => {
     let active = true
-    loadFeed()
-      .then((result) => active && setLoaded(result))
-      .catch(() => active && setFailed(true))
+    const refresh = (initial: boolean) =>
+      loadFeed()
+        .then((result) => active && setLoaded(result))
+        .catch(() => active && initial && setFailed(true))
+
+    refresh(true)
+
+    // Keep an open tab current: re-fetch hourly, and whenever it regains focus
+    // after being hidden a while (so a phone left open overnight catches up).
+    const hourly = setInterval(() => refresh(false), 60 * 60 * 1000)
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') refresh(false)
+    }
+    document.addEventListener('visibilitychange', onVisible)
+
     return () => {
       active = false
+      clearInterval(hourly)
+      document.removeEventListener('visibilitychange', onVisible)
     }
   }, [])
 
@@ -94,7 +125,12 @@ export function App() {
           </span>
           Family World Cup 2026
         </h1>
-        <p className={styles.subtitle}>How everyone&apos;s teams are doing.</p>
+        <p className={styles.subtitle}>
+          How everyone&apos;s teams are doing.{' '}
+          <a className={styles.aboutLink} href={ABOUT_HASH}>
+            ℹ️ How it works
+          </a>
+        </p>
       </header>
 
       <div className={styles.claimBar}>
@@ -120,15 +156,19 @@ export function App() {
         )}
       </div>
 
-      {failed && (
+      {showAbout && <AboutView onBack={closeAbout} />}
+
+      {!showAbout && failed && (
         <div className={styles.center}>
           Couldn&apos;t load the tournament data. Please check your connection and refresh.
         </div>
       )}
 
-      {!failed && !derived && <div className={styles.center}>Loading the tournament…</div>}
+      {!showAbout && !failed && !derived && (
+        <div className={styles.center}>Loading the tournament…</div>
+      )}
 
-      {derived && (
+      {!showAbout && derived && (
         <FavorProvider value={(team) => derived.favorByTeam.get(team)}>
         <main>
           {tab === 'me' && (
@@ -170,7 +210,13 @@ export function App() {
         </FavorProvider>
       )}
 
-      <Tabs active={tab} onChange={setTab} />
+      <Tabs
+        active={tab}
+        onChange={(k) => {
+          setTab(k)
+          closeAbout()
+        }}
+      />
     </div>
   )
 }

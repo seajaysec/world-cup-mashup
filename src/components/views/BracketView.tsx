@@ -7,14 +7,15 @@ import { buildSlotResolver, computeGroupTables, type Slot } from '../../lib/brac
 import { FavorMark, OwnerChip } from '../Badges'
 import styles from '../../styles/app.module.css'
 
-// Top → bottom: the trophy first, the opening round last.
-const ROUNDS: { key: string; label: string }[] = [
-  { key: 'Final', label: 'Final' },
+// Top → bottom: the trophy first, the first knockout round last (the group
+// stage — the real start — sits below this, in its own section).
+const ROUNDS: { key: string; label: string; sub?: string }[] = [
+  { key: 'Final', label: 'Final', sub: 'last 2' },
   { key: 'Match for third place', label: '3rd-place playoff' },
-  { key: 'Semi-final', label: 'Semi-finals' },
-  { key: 'Quarter-final', label: 'Quarter-finals' },
-  { key: 'Round of 16', label: 'Round of 16' },
-  { key: 'Round of 32', label: 'World Cup Start — 32 Teams' },
+  { key: 'Semi-final', label: 'Semi-finals', sub: 'last 4' },
+  { key: 'Quarter-final', label: 'Quarter-finals', sub: 'last 8' },
+  { key: 'Round of 16', label: 'Round of 16', sub: 'last 16' },
+  { key: 'Round of 32', label: 'Round of 32', sub: 'first knockout round' },
 ]
 
 function winnerSide(match: FeedMatch): 1 | 2 | 0 {
@@ -23,14 +24,25 @@ function winnerSide(match: FeedMatch): 1 | 2 | 0 {
   return ft[0] > ft[1] ? 1 : ft[1] > ft[0] ? 2 : 0
 }
 
-function statusLabel(match: FeedMatch, now: Date): string {
-  if (match.score?.ft) return '✓ Full time'
+type StatusTone = 'done' | 'today' | 'soon' | 'wait'
+
+/** Plain-English temporal status, so it's obvious whether a game is past,
+ * happening, or still to come. */
+function matchStatus(match: FeedMatch, now: Date): { text: string; tone: StatusTone } {
+  if (match.score?.ft) return { text: '✓ Played', tone: 'done' }
   const kickoff = parseKickoff(match.date, match.time)
-  if (kickoff) {
-    const sameDay = kickoff.toISOString().slice(0, 10) === now.toISOString().slice(0, 10)
-    if (sameDay) return '🔴 Today'
-  }
-  return '⏳ Upcoming'
+  if (!kickoff) return { text: 'Upcoming', tone: 'soon' }
+  const day = (d: Date) => d.toISOString().slice(0, 10)
+  if (day(kickoff) === day(now)) return { text: '● Playing today', tone: 'today' }
+  if (kickoff.getTime() < now.getTime()) return { text: 'Awaiting result', tone: 'wait' }
+  return { text: 'Upcoming', tone: 'soon' }
+}
+
+const STATUS_TONE_CLASS: Record<StatusTone, string> = {
+  done: styles.statusDone,
+  today: styles.statusToday,
+  soon: styles.statusSoon,
+  wait: styles.statusWait,
 }
 
 /** One side of a tie: a real team, an "A or B" candidate, or TBD. */
@@ -264,7 +276,10 @@ export function BracketView({
               <span className={styles.koChevron} aria-hidden>
                 {isOpen ? '▾' : '▸'}
               </span>
-              <span className={styles.koRoundLabel}>{round.label}</span>
+              <span className={styles.koRoundLabel}>
+                {round.label}
+                {round.sub && <span className={styles.koRoundSub}> · {round.sub}</span>}
+              </span>
               <span className={styles.koRoundCount}>
                 {round.played}/{round.games.length} played
               </span>
@@ -286,7 +301,14 @@ export function BracketView({
                       key={`${match.num ?? i}`}
                       className={`${styles.koMatch} ${fam ? styles.highlight : ''}`}
                     >
-                      <div className={styles.koStatus}>{statusLabel(match, now)}</div>
+                      {(() => {
+                        const st = matchStatus(match, now)
+                        return (
+                          <div className={`${styles.koStatus} ${STATUS_TONE_CLASS[st.tone]}`}>
+                            {st.text}
+                          </div>
+                        )
+                      })()}
                       <KoSlot
                         slot={s1}
                         goals={ft?.[0]}

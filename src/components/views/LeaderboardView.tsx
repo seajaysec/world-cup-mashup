@@ -4,6 +4,7 @@ import type { JokeProgress } from '../../lib/joke'
 import { ROSTER } from '../../data/roster'
 import { getTeamMeta, TEAMS, TIER_LABELS, TIER_RANGE_LABELS } from '../../data/teams'
 import { StatusBadge, TierBadge } from '../Badges'
+import { useFavor } from '../FavorContext'
 import styles from '../../styles/app.module.css'
 
 const TIER_ORDER: Tier[] = ['favorite', 'contender', 'darkhorse', 'longshot']
@@ -36,6 +37,8 @@ export function LeaderboardView({
   progressByTeam: Map<string, TeamProgress>
   ownerByTeam: Map<string, RosterEntry>
 }) {
+  const favor = useFavor()
+
   // Members whose current team is out — they need a fresh pick.
   const needNewTeam = leaderboard.filter((e) => e.progress.status === 'out')
 
@@ -76,6 +79,10 @@ export function LeaderboardView({
             entry.progress.status === 'notCompeting'
               ? jokeByMember.get(entry.roster.member)
               : undefined
+          const live =
+            entry.progress.status === 'alive' || entry.progress.status === 'champion'
+              ? favor(entry.roster.team)
+              : undefined
           return (
             <li className={rowClasses(entry, mine)} key={entry.roster.member}>
               <span className={styles.lbRank}>
@@ -89,7 +96,7 @@ export function LeaderboardView({
                 <div className={styles.lbTeam}>
                   {entry.roster.team}
                   {meta ? (
-                    <TierBadge tier={meta.tier} odds={meta.odds} />
+                    live && <TierBadge tier={live.tier} odds={live.odds} />
                   ) : (
                     joke && <TierBadge tier={joke.tier} />
                   )}
@@ -162,13 +169,16 @@ export function LeaderboardView({
         {upForGrabs.length === 0 ? (
           <span className={styles.muted}>None right now.</span>
         ) : (
-          upForGrabs.map((team) => (
-            <span className={styles.availableChip} key={team.name}>
-              <span aria-hidden>{team.flag}</span>
-              {team.name}
-              <TierBadge tier={team.tier} odds={team.odds} />
-            </span>
-          ))
+          upForGrabs.map((team) => {
+            const live = favor(team.name)
+            return (
+              <span className={styles.availableChip} key={team.name}>
+                <span aria-hidden>{team.flag}</span>
+                {team.name}
+                <TierBadge tier={live?.tier ?? team.tier} odds={live?.odds ?? team.odds} />
+              </span>
+            )
+          })
         )}
       </div>
 

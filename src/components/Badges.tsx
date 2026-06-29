@@ -1,5 +1,6 @@
 import type { Status, Tier } from '../types'
-import { formatOdds, getTeamMeta, TIER_LABELS } from '../data/teams'
+import { formatOdds, TIER_LABELS } from '../data/teams'
+import { useFavor } from './FavorContext'
 import styles from '../styles/app.module.css'
 
 const STATUS_TEXT: Record<Status, string> = {
@@ -39,18 +40,20 @@ export function TierBadge({ tier, odds }: { tier: Tier; odds?: number }) {
 }
 
 /**
- * Compact favoredness mark for dense rows (schedule, bracket): just the odds %,
- * coloured by tier. Renders nothing for unknown/placeholder teams.
+ * Compact, LIVE favoredness mark for dense rows (schedule, bracket): the current
+ * title-win odds, coloured by tier. Renders nothing for unknown/placeholder teams
+ * or teams that can no longer win it (0%).
  */
 export function FavorMark({ team }: { team: string }) {
-  const meta = getTeamMeta(team)
-  if (!meta) return null
+  const favor = useFavor()
+  const info = favor(team)
+  if (!info || info.odds <= 0) return null
   return (
     <span
-      className={`${styles.favorMark} ${TIER_CLASS[meta.tier]}`}
-      title={`${TIER_LABELS[meta.tier]} — ${formatOdds(meta.odds)} to win it all`}
+      className={`${styles.favorMark} ${TIER_CLASS[info.tier]}`}
+      title={`${TIER_LABELS[info.tier]} — ${formatOdds(info.odds)} to win it all (pre-tournament ${formatOdds(info.priorOdds)})`}
     >
-      {formatOdds(meta.odds)}
+      {formatOdds(info.odds)}
     </span>
   )
 }

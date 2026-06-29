@@ -4,6 +4,7 @@ import { canonicalTeamName, TEAMS } from '../data/teams'
 import { computeAllProgress, resolveMatches } from './progress'
 import { buildLeaderboard, type LeaderboardEntry } from './leaderboard'
 import { computeJokeProgress, isJokeTeam, type JokeProgress } from './joke'
+import { computeFavor, type FavorInfo } from './odds'
 
 export interface Derived {
   /** All matches with bracket placeholders resolved to real team names. */
@@ -21,6 +22,8 @@ export interface Derived {
   jokeByTeam: Map<string, JokeProgress>
   /** Joke season per owning member, for quick lookup. */
   jokeByMember: Map<string, JokeProgress>
+  /** Live favoredness (Elo + title odds) per canonical team name. */
+  favorByTeam: Map<string, FavorInfo>
 }
 
 /** Crunch the raw feed into everything the views need. Pure + memo-friendly. */
@@ -55,6 +58,8 @@ export function derive(rawMatches: FeedMatch[], now: Date): Derived {
     }
   }
 
+  const favorByTeam = computeFavor(matches, progressByTeam)
+
   return {
     matches,
     progressByTeam,
@@ -64,6 +69,7 @@ export function derive(rawMatches: FeedMatch[], now: Date): Derived {
     ownerByTeam,
     jokeByTeam,
     jokeByMember,
+    favorByTeam,
   }
 }
 

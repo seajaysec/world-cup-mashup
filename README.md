@@ -59,10 +59,27 @@ Everything family-specific lives in two files:
   that history and frees the seat. (Players can also pencil in a provisional
   replacement on the My Team tab; that's stored only in their browser until you
   make it official here.)
-- `src/data/teams.ts` — each team's flag, group, and favoredness `tier`
-  (`favorite` / `contender` / `darkhorse` / `longshot`). The tiers are a
-  subjective pre-tournament guess; tune them to taste. The `TEAM_ALIASES` map
-  there handles spelling differences (e.g. `Congo DR` → `DR Congo`).
+- `src/data/teams.ts` — each team's flag, group, and **pre-tournament title odds**
+  (`odds`, a percent). This is only the *prior*; the live favoredness is computed
+  from it (see below). Tiers (`favorite` / `contender` / `darkhorse` / `longshot`)
+  are derived from the odds via the bands in `tierForOdds`. The `TEAM_ALIASES` map
+  handles spelling differences (e.g. `Congo DR` → `DR Congo`).
+
+## How favoredness works (live odds)
+
+Favoredness isn't a static number — it's computed in `src/lib/odds.ts`:
+
+1. Each team starts at an Elo rating seeded from its pre-tournament `odds` prior.
+2. Every played match nudges both teams' ratings (World-Football-Elo style): the
+   swing scales with the result, how surprising it was given the **opponent's
+   current rating**, and the **goal margin**.
+3. Live **title-win odds** are a softmax over the current ratings of the teams
+   still alive (eliminated = 0%, a crowned champion = 100%), and the tier is
+   derived from those live odds.
+
+So a team's odds drift from their prior as they win/lose against weak or strong
+opposition, and they're shown wherever a team appears. (The openfootball feed has
+no save/possession data, so the inputs are results, goals, and opponent strength.)
 
 ## Develop
 

@@ -11,6 +11,7 @@ import {
   setRepick,
 } from './lib/format'
 import { Tabs, type TabKey } from './components/Tabs'
+import { FavorProvider } from './components/FavorContext'
 import { ClaimPicker } from './components/ClaimPicker'
 import { MyTeamView } from './components/views/MyTeamView'
 import { LeaderboardView } from './components/views/LeaderboardView'
@@ -128,6 +129,7 @@ export function App() {
       {!failed && !derived && <div className={styles.center}>Loading the tournament…</div>}
 
       {derived && (
+        <FavorProvider value={(team) => derived.favorByTeam.get(team)}>
         <main>
           {tab === 'me' && (
             <MyTeamView
@@ -165,6 +167,7 @@ export function App() {
 
           {loaded && <p className={styles.feedNote}>{feedNote(loaded)}</p>}
         </main>
+        </FavorProvider>
       )}
 
       <Tabs active={tab} onChange={setTab} />

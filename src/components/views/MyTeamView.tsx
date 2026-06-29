@@ -1,9 +1,10 @@
 import type { FeedMatch, TeamMeta } from '../../types'
 import type { LeaderboardEntry } from '../../lib/leaderboard'
 import type { JokeProgress } from '../../lib/joke'
-import { getTeamMeta } from '../../data/teams'
+import { formatOdds, getTeamMeta, TIER_LABELS } from '../../data/teams'
 import { formatKickoff, formatSlot, isPlaceholder } from '../../lib/format'
 import { StatusBadge, TierBadge } from '../Badges'
+import { useFavor } from '../FavorContext'
 import { ClaimPicker } from '../ClaimPicker'
 import { JokeCard } from '../JokeCard'
 import styles from '../../styles/app.module.css'
@@ -151,6 +152,7 @@ export function MyTeamView({
   onRepick: (team: string) => void
   onClearRepick: () => void
 }) {
+  const favor = useFavor()
   if (!entry) {
     return (
       <div className={styles.card}>
@@ -172,6 +174,7 @@ export function MyTeamView({
   }
 
   const meta = getTeamMeta(roster.team)
+  const live = progress.status === 'alive' || progress.status === 'champion' ? favor(roster.team) : undefined
 
   return (
     <>
@@ -187,9 +190,19 @@ export function MyTeamView({
         </div>
         <div className={styles.heroBadges}>
           <StatusBadge status={progress.status} />
-          {meta && <TierBadge tier={meta.tier} odds={meta.odds} />}
+          {live && <TierBadge tier={live.tier} odds={live.odds} />}
         </div>
         <p className={styles.muted}>{progress.standingLabel}</p>
+        {live && (
+          <p className={styles.lbStat}>
+            {formatOdds(live.odds)} to win it all · was {formatOdds(live.priorOdds)} before kickoff
+          </p>
+        )}
+        {!live && meta && progress.status === 'out' && (
+          <p className={styles.lbStat}>
+            Pre-tournament: {TIER_LABELS[meta.tier]} · {formatOdds(meta.odds)} to win it all
+          </p>
+        )}
       </div>
 
       <div className={styles.card}>

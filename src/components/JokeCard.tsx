@@ -1,4 +1,5 @@
 import type { JokeProgress } from '../lib/joke'
+import { TierBadge } from './Badges'
 import styles from '../styles/app.module.css'
 
 const RESULT_CLASS: Record<'W' | 'D' | 'L', string> = {
@@ -29,9 +30,18 @@ export function JokeCard({ joke, member }: { joke: JokeProgress; member: string 
             <span className={styles.heroMember}>{member}&apos;s pick</span>
           </div>
         </div>
-        <span className={`${styles.badge} ${styles.statusSparkle}`}>✨ Exhibition side</span>
+        <div className={styles.heroBadges}>
+          <span className={`${styles.badge} ${styles.statusSparkle}`}>✨ Exhibition side</span>
+          <TierBadge tier={joke.tier} />
+        </div>
         <p className={styles.muted}>{joke.standingLabel}</p>
         <p className={styles.jokeBlurb}>{joke.blurb}</p>
+      </div>
+
+      <div className={styles.card}>
+        <div className={styles.sectionTitle}>If they were really in it…</div>
+        <div className={styles.nextOpponent}>🔮 {joke.projection}</div>
+        {joke.pedigree && <p className={styles.muted}>{joke.pedigree}</p>}
       </div>
 
       <div className={styles.card}>

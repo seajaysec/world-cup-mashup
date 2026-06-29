@@ -46,8 +46,10 @@ export function App() {
     }
   }, [])
 
-  // Capture "now" once per load so the joke seasons and schedule are stable for the render.
-  const derived = useMemo(() => (loaded ? derive(loaded.feed.matches, new Date()) : null), [loaded])
+  // Capture "now" once per load so the joke seasons, schedule, and bracket are
+  // stable (and date-aware) for the render.
+  const now = useMemo(() => new Date(), [loaded])
+  const derived = useMemo(() => (loaded ? derive(loaded.feed.matches, now) : null), [loaded, now])
 
   function claim(member: string) {
     persistClaim(member)
@@ -150,7 +152,12 @@ export function App() {
             />
           )}
           {tab === 'bracket' && (
-            <BracketView matches={derived.matches} owners={derived.ownerByTeam} myTeam={myTeam} />
+            <BracketView
+              matches={derived.matches}
+              owners={derived.ownerByTeam}
+              myTeam={myTeam}
+              now={now}
+            />
           )}
           {tab === 'schedule' && (
             <ScheduleView matches={derived.matches} owners={derived.ownerByTeam} myTeam={myTeam} />

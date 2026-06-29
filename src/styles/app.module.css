@@ -574,6 +574,77 @@
   font-size: 1rem;
   flex: none;
 }
+.koTbd .koName {
+  color: var(--color-text-faint);
+  font-style: italic;
+}
+.koOr {
+  color: var(--color-text-faint);
+  font-style: normal;
+  font-size: 0.78rem;
+  padding: 0 0.15em;
+}
+.koStatus {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-faint);
+  margin-bottom: 0.2rem;
+}
+
+/* ---- Group-stage tables in the bracket ---------------------------------- */
+.groupGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2);
+}
+.groupCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+}
+.groupName {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-faint);
+  margin-bottom: var(--space-1);
+}
+.groupRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.2rem 0;
+  color: var(--color-text-muted);
+}
+.groupRow + .groupRow {
+  border-top: 1px dashed var(--color-border);
+}
+.groupAdv {
+  color: var(--color-text);
+}
+.groupTeam {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.groupOwner {
+  color: var(--color-accent);
+  font-size: 0.8rem;
+}
+.groupPts {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 560px) {
+  .groupGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
 .koGoals {
   font-weight: 700;
   font-variant-numeric: tabular-nums;

@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react'
 import type { FeedMatch, RosterEntry } from '../../types'
 import { canonicalTeamName, getTeamMeta } from '../../data/teams'
-import { formatKickoff, formatSlot, isPlaceholder } from '../../lib/format'
+import { formatKickoff, parseKickoff } from '../../lib/format'
 import { happyIcon, sadIcon } from '../../lib/icons'
+import { buildSlotResolver, computeGroupTables, type Slot } from '../../lib/bracket'
 import { OwnerChip } from '../Badges'
 import styles from '../../styles/app.module.css'
 
@@ -16,34 +17,25 @@ const ROUNDS: { key: string; label: string }[] = [
   { key: 'Round of 32', label: 'World Cup Start — 32 Teams' },
 ]
 
-interface Round {
-  key: string
-  label: string
-  games: FeedMatch[]
-  played: number
-  /** True once at least one real team has reached this round. */
-  hasTeams: boolean
-}
-
-function buildRounds(matches: FeedMatch[]): Round[] {
-  return ROUNDS.map((r) => {
-    const games = matches
-      .filter((m) => m.round === r.key)
-      .sort((a, b) => (a.num ?? 0) - (b.num ?? 0))
-    const played = games.filter((m) => m.score?.ft).length
-    const hasTeams = games.some((m) => !isPlaceholder(m.team1) || !isPlaceholder(m.team2))
-    return { ...r, games, played, hasTeams }
-  }).filter((r) => r.games.length > 0)
-}
-
 function winnerSide(match: FeedMatch): 1 | 2 | 0 {
   const ft = match.score?.ft
   if (!ft) return 0
   return ft[0] > ft[1] ? 1 : ft[1] > ft[0] ? 2 : 0
 }
 
-function KoTeam({
-  team,
+function statusLabel(match: FeedMatch, now: Date): string {
+  if (match.score?.ft) return '✓ Full time'
+  const kickoff = parseKickoff(match.date, match.time)
+  if (kickoff) {
+    const sameDay = kickoff.toISOString().slice(0, 10) === now.toISOString().slice(0, 10)
+    if (sameDay) return '🔴 Today'
+  }
+  return '⏳ Upcoming'
+}
+
+/** One side of a tie: a real team, an "A or B" candidate, or TBD. */
+function KoSlot({
+  slot,
   goals,
   isWinner,
   isLoser,
@@ -51,7 +43,7 @@ function KoTeam({
   owners,
   myTeam,
 }: {
-  team: string
+  slot: Slot
   goals?: number
   isWinner: boolean
   isLoser: boolean
@@ -59,10 +51,38 @@ function KoTeam({
   owners: Map<string, RosterEntry>
   myTeam: string | null
 }) {
-  const placeholder = isPlaceholder(team)
-  const canonical = placeholder ? team : canonicalTeamName(team)
-  const owner = placeholder ? undefined : owners.get(canonical)
-  const mine = !placeholder && myTeam === canonical
+  if (slot.kind === 'tbd') {
+    return (
+      <div className={`${styles.koTeam} ${styles.koTbd}`}>
+        <span className={styles.koFlag} aria-hidden>
+          ·
+        </span>
+        <span className={styles.koName}>To be decided</span>
+      </div>
+    )
+  }
+
+  if (slot.kind === 'candidates') {
+    const fa = getTeamMeta(slot.a)?.flag ?? '·'
+    const fb = getTeamMeta(slot.b)?.flag ?? '·'
+    return (
+      <div className={`${styles.koTeam} ${styles.koTbd}`}>
+        <span className={styles.koFlag} aria-hidden>
+          {fa}
+        </span>
+        <span className={styles.koName}>
+          {slot.a} <span className={styles.koOr}>or</span> {slot.b}
+        </span>
+        <span className={styles.koFlag} aria-hidden>
+          {fb}
+        </span>
+      </div>
+    )
+  }
+
+  const team = slot.team
+  const owner = owners.get(canonicalTeamName(team))
+  const mine = myTeam === canonicalTeamName(team)
   const classes = [styles.koTeam]
   if (isWinner) classes.push(styles.koWin)
   if (isLoser) classes.push(styles.koLose)
@@ -72,9 +92,9 @@ function KoTeam({
   return (
     <div className={classes.join(' ')}>
       <span aria-hidden className={styles.koFlag}>
-        {placeholder ? '·' : (getTeamMeta(team)?.flag ?? '·')}
+        {getTeamMeta(team)?.flag ?? '·'}
       </span>
-      <span className={styles.koName}>{placeholder ? formatSlot(team) : team}</span>
+      <span className={styles.koName}>{team}</span>
       {owner && <OwnerChip member={owner.member} flag={owner.flag} />}
       {mood && (
         <span aria-hidden className={styles.koMood}>
@@ -86,38 +106,117 @@ function KoTeam({
   )
 }
 
-export function BracketView({
+function GroupStage({
   matches,
   owners,
   myTeam,
+  open,
+  onToggle,
 }: {
   matches: FeedMatch[]
   owners: Map<string, RosterEntry>
   myTeam: string | null
+  open: boolean
+  onToggle: () => void
 }) {
-  const rounds = useMemo(() => buildRounds(matches), [matches])
+  const tables = useMemo(() => computeGroupTables(matches), [matches])
+  if (tables.length === 0) return null
+  const complete = tables.every((t) => t.rows.every((r) => r.record.played >= 3))
+
+  return (
+    <div className={styles.koRound}>
+      <button type="button" className={styles.koRoundHead} aria-expanded={open} onClick={onToggle}>
+        <span className={styles.koChevron} aria-hidden>
+          {open ? '▾' : '▸'}
+        </span>
+        <span className={styles.koRoundLabel}>Group stage</span>
+        <span className={styles.koRoundCount}>{complete ? 'complete' : 'in progress'}</span>
+      </button>
+      {open && (
+        <div className={styles.groupGrid}>
+          {tables.map(({ group, rows }) => (
+            <div className={styles.groupCard} key={group}>
+              <div className={styles.groupName}>{group}</div>
+              {rows.map((row) => {
+                const owner = owners.get(row.team)
+                const mine = myTeam === row.team
+                return (
+                  <div
+                    key={row.team}
+                    className={`${styles.groupRow} ${row.advanced ? styles.groupAdv : ''} ${mine ? styles.koMine : ''}`}
+                  >
+                    <span className={styles.koFlag} aria-hidden>
+                      {getTeamMeta(row.team)?.flag ?? '·'}
+                    </span>
+                    <span className={styles.groupTeam}>
+                      {row.advanced ? '✅ ' : ''}
+                      {row.team}
+                      {owner && <span className={styles.groupOwner}> · {owner.member}</span>}
+                    </span>
+                    <span className={styles.groupPts}>{row.record.points}</span>
+                  </div>
+                )
+              })}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+export function BracketView({
+  matches,
+  owners,
+  myTeam,
+  now,
+}: {
+  matches: FeedMatch[]
+  owners: Map<string, RosterEntry>
+  myTeam: string | null
+  now: Date
+}) {
+  const resolveSlot = useMemo(() => buildSlotResolver(matches), [matches])
+
+  const rounds = useMemo(
+    () =>
+      ROUNDS.map((r) => {
+        const games = matches
+          .filter((m) => m.round === r.key)
+          .sort((a, b) => (a.num ?? 0) - (b.num ?? 0))
+        const played = games.filter((m) => m.score?.ft).length
+        // "Live" if any game is decided or has two concrete teams ready to play.
+        const active = games.some((m) => {
+          if (m.score?.ft) return true
+          const s1 = resolveSlot(m.team1)
+          const s2 = resolveSlot(m.team2)
+          return s1.kind === 'team' && s2.kind === 'team'
+        })
+        return { ...r, games, played, active }
+      }).filter((r) => r.games.length > 0),
+    [matches, resolveSlot],
+  )
+
   const [open, setOpen] = useState<Record<string, boolean>>(() => {
     const init: Record<string, boolean> = {}
-    for (const r of buildRounds(matches)) init[r.key] = r.hasTeams
+    for (const r of rounds) init[r.key] = r.active
+    // Group-stage history starts open — it's the bulk of what's happened.
+    init.__groups = true
     return init
   })
+  const toggle = (key: string) => setOpen((o) => ({ ...o, [key]: !o[key] }))
 
   const final = matches.find((m) => m.round === 'Final')
-  const finalWinner =
-    final && final.score?.ft
-      ? winnerSide(final) === 1
-        ? final.team1
-        : winnerSide(final) === 2
-          ? final.team2
-          : null
-      : null
+  const finalWin = final ? winnerSide(final) : 0
+  const finalWinner = finalWin === 1 ? final!.team1 : finalWin === 2 ? final!.team2 : null
   const championOwner = finalWinner ? owners.get(canonicalTeamName(finalWinner)) : undefined
 
   return (
     <section>
       <p className={styles.lbIntro}>
-        The road to the trophy, trophy-first. Tap a round to open or close it — rounds without teams
-        yet start collapsed. Played games show the score and who advanced.
+        The knockout road, trophy-first. Decided games show the score and who went through; upcoming
+        ties show the real matchup (or the two teams a slot is waiting on). The completed group stage
+        is at the bottom. Tap any round to fold it.
       </p>
 
       {finalWinner && (
@@ -135,14 +234,14 @@ export function BracketView({
       )}
 
       {rounds.map((round) => {
-        const isOpen = open[round.key] ?? round.hasTeams
+        const isOpen = open[round.key] ?? round.active
         return (
           <div key={round.key} className={styles.koRound}>
             <button
               type="button"
               className={styles.koRoundHead}
               aria-expanded={isOpen}
-              onClick={() => setOpen((o) => ({ ...o, [round.key]: !isOpen }))}
+              onClick={() => toggle(round.key)}
             >
               <span className={styles.koChevron} aria-hidden>
                 {isOpen ? '▾' : '▸'}
@@ -159,16 +258,19 @@ export function BracketView({
                   const ft = match.score?.ft
                   const win = winnerSide(match)
                   const seed = match.num ?? i
+                  const s1 = resolveSlot(match.team1)
+                  const s2 = resolveSlot(match.team2)
                   const fam =
-                    owners.has(canonicalTeamName(match.team1)) ||
-                    owners.has(canonicalTeamName(match.team2))
+                    (s1.kind === 'team' && owners.has(canonicalTeamName(s1.team))) ||
+                    (s2.kind === 'team' && owners.has(canonicalTeamName(s2.team)))
                   return (
                     <div
                       key={`${match.num ?? i}`}
                       className={`${styles.koMatch} ${fam ? styles.highlight : ''}`}
                     >
-                      <KoTeam
-                        team={match.team1}
+                      <div className={styles.koStatus}>{statusLabel(match, now)}</div>
+                      <KoSlot
+                        slot={s1}
                         goals={ft?.[0]}
                         isWinner={win === 1}
                         isLoser={win === 2}
@@ -176,8 +278,8 @@ export function BracketView({
                         owners={owners}
                         myTeam={myTeam}
                       />
-                      <KoTeam
-                        team={match.team2}
+                      <KoSlot
+                        slot={s2}
                         goals={ft?.[1]}
                         isWinner={win === 2}
                         isLoser={win === 1}
@@ -197,6 +299,14 @@ export function BracketView({
           </div>
         )
       })}
+
+      <GroupStage
+        matches={matches}
+        owners={owners}
+        myTeam={myTeam}
+        open={open.__groups ?? true}
+        onToggle={() => toggle('__groups')}
+      />
     </section>
   )
 }

@@ -45,7 +45,8 @@ export function LeaderboardView({
       <p className={styles.lbIntro}>
         Everyone ranked best to worst. 👑 leads the race to <strong>win it all</strong>; 🥄 is the
         wooden spoon for <strong>losing the whole thing</strong>. Ties break on group points, goal
-        difference, then goals scored. The ✨ exhibition sides play their own game.
+        difference, then goals scored. Only the current last-place real team holds the 🥄 — it moves
+        as teams go out. The ✨ exhibition sides play their own game.
       </p>
 
       <ol className={styles.lbList} style={{ listStyle: 'none', margin: 0, padding: 0 }}>
@@ -68,7 +69,11 @@ export function LeaderboardView({
                 <div className={styles.lbMember}>{entry.roster.member}</div>
                 <div className={styles.lbTeam}>
                   {entry.roster.team}
-                  {meta && <TierBadge tier={meta.tier} />}
+                  {meta ? (
+                    <TierBadge tier={meta.tier} />
+                  ) : (
+                    joke && <TierBadge tier={joke.tier} />
+                  )}
                 </div>
               </span>
               <span className={styles.lbRight}>
@@ -131,6 +136,7 @@ export function LeaderboardView({
             <span className={styles.availableChip} key={team.name}>
               <span aria-hidden>{team.flag}</span>
               {team.name}
+              <TierBadge tier={team.tier} />
             </span>
           ))
         )}

@@ -1,4 +1,4 @@
-import type { FeedMatch } from '../types'
+import type { FeedMatch, Tier } from '../types'
 
 /**
  * The "just for fun" picks (La Galaxy 🌌, Denver Nuggets 🏀) aren't in the World
@@ -27,6 +27,12 @@ export interface JokeProgress {
   team: string
   emoji: string
   league: string
+  /** How favored they'd be if they were really in it (based on real pedigree). */
+  tier: Tier
+  /** Where they'd likely land in a World Cup, given their real-world résumé. */
+  projection: string
+  /** One line of real-world bona fides. */
+  pedigree: string
   record: { won: number; drawn: number; lost: number; points: number; for: number; against: number }
   form: string
   recent: JokeMatch[]
@@ -41,6 +47,9 @@ interface JokeConfig {
   team: string
   emoji: string
   league: string
+  tier: Tier
+  projection: string
+  pedigree: string
   opponents: string[]
   /** Turn a day's real-World-Cup output into this team's silly scoreline. */
   score: (realGoals: number, realMatches: number, seed: number) => [number, number]
@@ -52,6 +61,10 @@ const CONFIGS: Record<string, JokeConfig> = {
     team: 'Galaxy',
     emoji: '🌌',
     league: 'the Intergalactic Cup',
+    // LA Galaxy: the most decorated club in MLS history (6 MLS Cups, incl. 2024).
+    tier: 'contender',
+    projection: 'Deep run — a quarter-final or better, easily',
+    pedigree: 'LA Galaxy: 6× MLS Cup champions (most ever), 2024 winners.',
     opponents: [
       'Andromeda FC',
       'Black Hole United',
@@ -75,6 +88,10 @@ const CONFIGS: Record<string, JokeConfig> = {
     team: 'Denver Nuggets',
     emoji: '🏀',
     league: 'the Mile-High Invitational',
+    // 2023 NBA champions; a perennial title contender (wrong sport, elite team).
+    tier: 'favorite',
+    projection: 'Title contender — they’d bully the bracket',
+    pedigree: '2023 NBA champions, perennial Western Conference power.',
     opponents: [
       'Lakers Lads',
       'Court Crashers',
@@ -85,10 +102,10 @@ const CONFIGS: Record<string, JokeConfig> = {
       'Three-Point Town',
       'Tip-Off Town',
     ],
-    // Basketball scores, because of course. Real WC activity sets the pace.
+    // Basketball scores, and champions usually win. Real WC activity sets pace.
     score: (realGoals, realMatches, seed) => [
-      78 + realGoals * 3 + (seed % 12),
-      78 + realMatches * 2 + ((seed >> 3) % 12),
+      96 + realGoals * 2 + (seed % 18),
+      82 + realMatches * 2 + ((seed >> 3) % 14),
     ],
     blurbs: ({ points, lastGoals }) => [
       `🏀 The Nuggets put up ${lastGoals} — wrong sport, right energy.`,
@@ -147,6 +164,9 @@ export function computeJokeProgress(team: string, matches: FeedMatch[], now: Dat
       team,
       emoji: '❓',
       league: 'the unknown',
+      tier: 'longshot',
+      projection: 'Anyone’s guess',
+      pedigree: '',
       record: { won: 0, drawn: 0, lost: 0, points: 0, for: 0, against: 0 },
       form: '',
       recent: [],
@@ -199,6 +219,9 @@ export function computeJokeProgress(team: string, matches: FeedMatch[], now: Dat
     team: config.team,
     emoji: config.emoji,
     league: config.league,
+    tier: config.tier,
+    projection: config.projection,
+    pedigree: config.pedigree,
     record,
     form,
     recent,

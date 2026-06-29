@@ -31,13 +31,17 @@ export interface RosterEntry {
   flag: string
   /** True for the for-fun picks that aren't actually in the World Cup. */
   joke?: boolean
+  /** ISO date (YYYY-MM-DD) the current `team` was picked up. Absent = since the
+   * tournament started. Used to credit match results to the right owner. */
+  since?: string
   /**
-   * Teams this member previously held and gave up (e.g. after a knockout), most
-   * recent last. When Chris re-assigns someone, move their old team here and set
-   * `team`/`flag` to the new pick. Purely informational — ownership always comes
-   * from the current `team`.
+   * Teams this member previously held and gave up (after a knockout), oldest
+   * first. `until` is the date they switched away (= the next team's `since`).
+   * When re-assigning someone, move their old team here with the switch date and
+   * set `team`/`flag`/`since` to the new pick. Each former team is also a tally
+   * mark in the wooden-spoon race.
    */
-  formerTeams?: string[]
+  formerTeams?: { team: string; until: string }[]
 }
 
 /** Static metadata about a real World Cup team. */

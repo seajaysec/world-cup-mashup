@@ -5,6 +5,7 @@ import { computeAllProgress, resolveMatches } from './progress'
 import { buildLeaderboard, type LeaderboardEntry } from './leaderboard'
 import { computeJokeProgress, isJokeTeam, type JokeProgress } from './joke'
 import { computeFavor, type FavorInfo } from './odds'
+import { computeFeuds, computeSpoons, type Feuds, type SpoonTally } from './feuds'
 
 export interface Derived {
   /** All matches with bracket placeholders resolved to real team names. */
@@ -24,6 +25,10 @@ export interface Derived {
   jokeByMember: Map<string, JokeProgress>
   /** Live favoredness (Elo + title odds) per canonical team name. */
   favorByTeam: Map<string, FavorInfo>
+  /** Family-vs-family defeats ("body count"). */
+  feuds: Feuds
+  /** Cumulative wooden-spoon tally per member, most first. */
+  spoons: SpoonTally[]
 }
 
 /** Crunch the raw feed into everything the views need. Pure + memo-friendly. */
@@ -59,6 +64,8 @@ export function derive(rawMatches: FeedMatch[], now: Date): Derived {
   }
 
   const favorByTeam = computeFavor(matches, progressByTeam)
+  const feuds = computeFeuds(ROSTER, matches)
+  const spoons = computeSpoons(ROSTER, progressByTeam)
 
   return {
     matches,
@@ -70,6 +77,8 @@ export function derive(rawMatches: FeedMatch[], now: Date): Derived {
     jokeByTeam,
     jokeByMember,
     favorByTeam,
+    feuds,
+    spoons,
   }
 }
 

@@ -163,6 +163,7 @@ export function MyTeamView({
   repickTeam,
   onRepick,
   onClearRepick,
+  mySpoons,
 }: {
   entry: LeaderboardEntry | undefined
   total: number
@@ -173,6 +174,7 @@ export function MyTeamView({
   repickTeam: string | undefined
   onRepick: (team: string) => void
   onClearRepick: () => void
+  mySpoons: number
 }) {
   const favor = useFavor()
   if (!entry) {
@@ -231,11 +233,15 @@ export function MyTeamView({
       <div className={styles.card}>
         <div className={styles.rankCallout}>
           {entry.isLeader && '👑 '}
-          {entry.isWoodenSpoon && '🥄 '}
           <strong>#{entry.rank}</strong> of {total}
           {entry.isLeader && ' — top of the family! On track to win it all.'}
-          {entry.isWoodenSpoon && ' — bottom of the pile (so far).'}
         </div>
+        {mySpoons > 0 && (
+          <p className={styles.lbStat}>
+            🥄 {mySpoons} wooden spoon{mySpoons === 1 ? '' : 's'} so far (teams of yours knocked
+            out) — see the Feuds tab.
+          </p>
+        )}
       </div>
 
       {progress.status === 'alive' && progress.nextMatch && (

@@ -9,8 +9,6 @@ export interface LeaderboardEntry {
   progress: TeamProgress
   /** Top of the board — on track to "win it all". */
   isLeader: boolean
-  /** Bottom real team — the "loses the whole thing" wooden spoon. */
-  isWoodenSpoon: boolean
 }
 
 /** Alive/champion sit above eliminated teams at the same stage. */
@@ -95,7 +93,6 @@ export function buildLeaderboard(
       roster,
       progress: progress.get(canonicalTeamName(roster.team))!,
       isLeader: false,
-      isWoodenSpoon: false,
     }
   })
 
@@ -104,16 +101,11 @@ export function buildLeaderboard(
     if (entries[i].rank === -1) entries[i].rank = entries[i - 1].rank
   }
 
-  // Leader = the single best pick (only if it's a real competitor).
+  // Leader = the single best pick (only if it's a real competitor). The wooden
+  // spoon is no longer the board's bottom team — it's a cumulative tally of
+  // knocked-out teams (see lib/feuds.ts → computeSpoons), shown on the Feuds tab.
   if (entries.length > 0 && entries[0].progress.status !== 'notCompeting') {
     entries[0].isLeader = true
-  }
-  // Wooden spoon = the worst real (non-joke) competitor.
-  for (let i = entries.length - 1; i >= 0; i--) {
-    if (entries[i].progress.status !== 'notCompeting') {
-      entries[i].isWoodenSpoon = true
-      break
-    }
   }
 
   return entries

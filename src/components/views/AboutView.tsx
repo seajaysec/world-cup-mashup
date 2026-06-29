@@ -63,14 +63,25 @@ export function AboutView({ onBack }: { onBack: () => void }) {
       <ul className={styles.aboutList}>
         <li>👑 The pick at the very top is on track to <strong>win it all</strong>.</li>
         <li>
-          🥄 The lowest real team is the <strong>wooden spoon</strong> — it loses the whole thing.
-          Only one team holds it at a time, and it moves as teams are knocked out.
+          🥄 <strong>Wooden spoons rack up.</strong> Every team you&apos;ve owned that gets knocked
+          out is one spoon. Whoever collects the <em>most</em> is the biggest loser — and wins that
+          prize. (So re-picking a doomed team and losing again costs you another spoon.) The
+          standings live on the <strong>Feuds</strong> tab.
         </li>
       </ul>
       <p className={styles.muted}>
         Note: leaderboard rank (how far you&apos;ve gone) and 🏆 title odds (how likely you are to
         win) are different — a team a round ahead can still be less likely to lift the trophy than a
         stronger team behind it.
+      </p>
+
+      <h2 className={styles.sectionTitle}>Family feuds (the body count)</h2>
+      <p>
+        On the <strong>Feuds</strong> tab, whenever your team beats another family member&apos;s team
+        in a real match, that&apos;s a “kill”. Crucially, each result is credited to whoever owned
+        the team <em>on the day it was played</em> — so when someone re-picks, their old team&apos;s
+        earlier games stay on their record, and a freshly-picked team&apos;s past games aren&apos;t
+        back-credited. Draws don&apos;t count.
       </p>
 
       <h2 className={styles.sectionTitle}>The for-fun picks</h2>
@@ -83,15 +94,18 @@ export function AboutView({ onBack }: { onBack: () => void }) {
 
       <h2 className={styles.sectionTitle}>The country rankings (just for fun)</h2>
       <p>
-        On the My Team page, each team&apos;s country is ranked against every country in the world on
-        nine indicators from{' '}
+        On the My Team page, each team&apos;s country is ranked <strong>against the other 48 World
+        Cup teams</strong> (a separate little competition — not the whole world) on nine indicators
+        from{' '}
         <a href="https://ourworldindata.org" target="_blank" rel="noreferrer">
           Our World in Data
         </a>{' '}
         (democracy, GDP per capita, life expectancy, happiness, gender equality, CO₂ per capita,
-        public debt, military spending, population) plus a SOCCER row driven by our live Elo. Each
-        label links to its source chart. England and Scotland use the UK&apos;s figures; some small
-        nations have no data for every metric. Data baked {OWID_GENERATED.slice(0, 10)}.
+        public debt, military spending, population) plus a SOCCER row driven by our live Elo. Tap any
+        metric to reveal the <strong>family</strong> leaderboard for it, with a 🏅 for the family
+        winner and a wooden-spoon-ish emoji for the loser. England and Scotland use the UK&apos;s
+        figures; some small nations have no data for every metric. Data baked{' '}
+        {OWID_GENERATED.slice(0, 10)}.
       </p>
 
       <h2 className={styles.sectionTitle}>Data &amp; updates</h2>

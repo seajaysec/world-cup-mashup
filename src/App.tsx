@@ -17,6 +17,7 @@ import { MyTeamView } from './components/views/MyTeamView'
 import { LeaderboardView } from './components/views/LeaderboardView'
 import { BracketView } from './components/views/BracketView'
 import { ScheduleView } from './components/views/ScheduleView'
+import { FeudsView } from './components/views/FeudsView'
 import { AboutView } from './components/views/AboutView'
 import styles from './styles/app.module.css'
 
@@ -182,6 +183,9 @@ export function App() {
               repickTeam={claimedMember ? repicks[claimedMember] : undefined}
               onRepick={repick}
               onClearRepick={clearMyRepick}
+              mySpoons={
+                derived.spoons.find((s) => s.member === claimedMember)?.count ?? 0
+              }
             />
           )}
           {tab === 'leaderboard' && (
@@ -203,6 +207,9 @@ export function App() {
           )}
           {tab === 'schedule' && (
             <ScheduleView matches={derived.matches} owners={derived.ownerByTeam} myTeam={myTeam} />
+          )}
+          {tab === 'feuds' && (
+            <FeudsView feuds={derived.feuds} spoons={derived.spoons} claimedMember={claimedMember} />
           )}
 
           {loaded && <p className={styles.feedNote}>{feedNote(loaded)}</p>}

@@ -36,16 +36,6 @@ describe('buildLeaderboard', () => {
     expect(board.slice(-2).every((e) => e.progress.status === 'notCompeting')).toBe(true)
   })
 
-  it('awards the wooden spoon to the worst real team still held', () => {
-    const spoon = board.find((e) => e.isWoodenSpoon)
-    // Curaçao was re-picked to Switzerland, so the worst remaining real team is
-    // Claire's New Zealand (1 pt, -6 GD).
-    expect(spoon?.roster.team).toBe('New Zealand')
-    expect(spoon?.roster.member).toBe('Claire')
-    // Exactly one wooden spoon, and it is not a joke pick.
-    expect(board.filter((e) => e.isWoodenSpoon)).toHaveLength(1)
-  })
-
   it('breaks ties between same-stage exits by group performance', () => {
     // Among group-stage exits, New Zealand (1 pt) ranks below South Korea (3 pts).
     const newZealand = board.findIndex((e) => e.roster.team === 'New Zealand')

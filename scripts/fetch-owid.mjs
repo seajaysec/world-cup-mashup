@@ -86,19 +86,14 @@ async function fetchMetric(metric) {
     if (!prev || year > prev.year) latest.set(code, { year, value })
   }
 
-  // Global ranking over all countries with data, per direction.
-  const ranked = [...latest.entries()]
-    .map(([code, v]) => ({ code, ...v }))
-    .sort((a, b) => (metric.dir === 'high' ? b.value - a.value : a.value - b.value))
-  const total = ranked.length
-  const rankByCode = new Map()
-  ranked.forEach((r, idx) => rankByCode.set(r.code, idx + 1))
-
+  // Store the latest value per World Cup team. Ranking (among WC teams, or among
+  // just the family's teams) is computed in the app so it can rank any subset —
+  // this is a separate competition, not "vs the whole world".
   const data = {}
   for (const [team, code] of Object.entries(TEAM_CODE)) {
     const v = latest.get(code)
     if (!v) continue
-    data[team] = { value: v.value, display: metric.fmt(v.value), rank: rankByCode.get(code), total, year: v.year }
+    data[team] = { value: v.value, display: metric.fmt(v.value), year: v.year }
   }
   return data
 }

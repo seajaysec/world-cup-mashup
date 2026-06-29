@@ -4,14 +4,21 @@ A dead-simple, mobile-first tracker for the family's 2026 World Cup pick'em. Eac
 person picked a team; this shows how everyone's doing, who's still in it, who's
 out, what's coming up, and who's winning (or losing) the family prizes.
 
-- **Pick your name** to follow your team — it's remembered in your browser only
-  (localStorage), no accounts.
+- **My Team** — pick your name (remembered in your browser only, no accounts) to
+  follow your team: status, next match, favoredness, and your rank. If your team
+  is knocked out, you can pencil in a still-alive replacement here.
 - **Standings** rank everyone best → worst. The top is on track to **win it all**
-  (👑); the bottom is the wooden spoon for **losing the whole thing** (🥄).
-- **Roster** shows who has which team, who's knocked out, and which teams nobody
-  picked.
+  (👑); the bottom is the wooden spoon for **losing the whole thing** (🥄). Also
+  lists owners who need a new team, the teams still up for grabs, and any re-pick
+  history.
+- **Bracket** — a portrait, collapsible knockout view (trophy at the top, the
+  opening round at the bottom) showing scores, who advanced (with happy/sad
+  icons), and who's booked into upcoming rounds.
 - **Schedule** lists upcoming matches and results in your local time zone, with
   venues — filter to just your team or all family teams.
+
+Owner chips appear next to every family team across matches, the schedule, and
+the bracket, so you always know whose pick is whose.
 
 ## Data
 
@@ -47,7 +54,11 @@ Everything family-specific lives in two files:
 
 - `src/data/roster.ts` — who picked what. To change a pick, edit the `team`
   (use the feed's spelling, or add an alias in `teams.ts`). Mark non-World-Cup
-  picks with `joke: true`.
+  picks with `joke: true`. When someone re-picks after a knockout, set their new
+  `team`/`flag` and move the old name into `formerTeams: [...]` — the app shows
+  that history and frees the seat. (Players can also pencil in a provisional
+  replacement on the My Team tab; that's stored only in their browser until you
+  make it official here.)
 - `src/data/teams.ts` — each team's flag, group, and favoredness `tier`
   (`favorite` / `contender` / `darkhorse` / `longshot`). The tiers are a
   subjective pre-tournament guess; tune them to taste. The `TEAM_ALIASES` map

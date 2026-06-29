@@ -487,20 +487,42 @@
 
 /* ---- Bracket ------------------------------------------------------------- */
 .koRound {
-  margin-top: var(--space-5);
+  margin-top: var(--space-3);
 }
 .koRoundHead {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  font-size: 1.05rem;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
   margin-bottom: var(--space-2);
+  text-align: left;
+}
+.koChevron {
+  color: var(--color-text-faint);
+  font-size: 0.9rem;
+  width: 1rem;
+  flex: none;
+}
+.koRoundLabel {
+  flex: 1;
+  font-size: 1.02rem;
+  font-weight: 600;
 }
 .koRoundCount {
   font-size: 0.72rem;
   color: var(--color-text-faint);
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  flex: none;
+}
+.koLose .koName {
+  color: var(--color-text-faint);
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--color-out) 60%, transparent);
 }
 .koList {
   display: flex;
@@ -547,6 +569,10 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.koMood {
+  font-size: 1rem;
+  flex: none;
 }
 .koGoals {
   font-weight: 700;
@@ -634,6 +660,24 @@
 .jokeScore {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+}
+
+/* ---- Re-pick ------------------------------------------------------------- */
+.repickCard {
+  border-color: color-mix(in srgb, var(--color-info) 40%, var(--color-border));
+}
+.repickMessage {
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  font-style: italic;
+}
+.repickActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  flex-wrap: wrap;
 }
 
 @media (min-width: 560px) {

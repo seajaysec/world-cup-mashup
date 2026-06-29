@@ -1,4 +1,4 @@
-import type { FeedMatch } from '../../types'
+import type { FeedMatch, TeamMeta } from '../../types'
 import type { LeaderboardEntry } from '../../lib/leaderboard'
 import type { JokeProgress } from '../../lib/joke'
 import { getTeamMeta } from '../../data/teams'
@@ -7,6 +7,84 @@ import { StatusBadge, TierBadge } from '../Badges'
 import { ClaimPicker } from '../ClaimPicker'
 import { JokeCard } from '../JokeCard'
 import styles from '../../styles/app.module.css'
+
+/** When your team is out, pencil in a still-alive replacement (local only). */
+function RepickPanel({
+  member,
+  deadTeam,
+  available,
+  repickTeam,
+  onRepick,
+  onClearRepick,
+}: {
+  member: string
+  deadTeam: string
+  available: TeamMeta[]
+  repickTeam: string | undefined
+  onRepick: (team: string) => void
+  onClearRepick: () => void
+}) {
+  const repickMeta = repickTeam ? getTeamMeta(repickTeam) : undefined
+  return (
+    <div className={`${styles.card} ${styles.repickCard}`}>
+      <div className={styles.sectionTitle}>Pick a replacement</div>
+      {repickTeam ? (
+        <>
+          <div className={styles.nextOpponent}>
+            {repickMeta?.flag ?? '🆕'} {repickTeam}
+          </div>
+          <p className={styles.muted}>
+            Provisional — saved on this device only. 📩 Message Chris to make it official:
+          </p>
+          <p className={styles.repickMessage}>“Hey Chris, {member} is re-picking {repickTeam}.”</p>
+          <div className={styles.repickActions}>
+            <label>
+              <span className="visually-hidden">Change replacement</span>
+              <select
+                className={styles.select}
+                value={repickTeam}
+                onChange={(e) => e.target.value && onRepick(e.target.value)}
+              >
+                {available.map((t) => (
+                  <option key={t.name} value={t.name}>
+                    {t.flag} {t.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button type="button" className={styles.linkButton} onClick={onClearRepick}>
+              Clear
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <p className={styles.muted}>
+            {deadTeam} is out. Choose a still-alive team nobody owns to pencil in as your new pick,
+            then tell Chris.
+          </p>
+          <label>
+            <span className="visually-hidden">Choose a replacement team</span>
+            <select
+              className={styles.select}
+              defaultValue=""
+              onChange={(e) => e.target.value && onRepick(e.target.value)}
+            >
+              <option value="" disabled>
+                {available.length ? 'Pick a replacement…' : 'No teams available right now'}
+              </option>
+              {available.map((t) => (
+                <option key={t.name} value={t.name}>
+                  {t.flag} {t.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        </>
+      )}
+    </div>
+  )
+}
 
 function NextMatch({ match, team }: { match: FeedMatch; team: string }) {
   const opponentRaw = match.team1 === team ? match.team2 : match.team1
@@ -58,12 +136,20 @@ export function MyTeamView({
   onClaim,
   claimedMember,
   joke,
+  available,
+  repickTeam,
+  onRepick,
+  onClearRepick,
 }: {
   entry: LeaderboardEntry | undefined
   total: number
   onClaim: (member: string) => void
   claimedMember: string | null
   joke: JokeProgress | undefined
+  available: TeamMeta[]
+  repickTeam: string | undefined
+  onRepick: (team: string) => void
+  onClearRepick: () => void
 }) {
   if (!entry) {
     return (
@@ -118,6 +204,17 @@ export function MyTeamView({
 
       {progress.status === 'alive' && progress.nextMatch && (
         <NextMatch match={progress.nextMatch} team={progress.team} />
+      )}
+
+      {progress.status === 'out' && (
+        <RepickPanel
+          member={roster.member}
+          deadTeam={roster.team}
+          available={available}
+          repickTeam={repickTeam}
+          onRepick={onRepick}
+          onClearRepick={onClearRepick}
+        />
       )}
 
       <GroupRecord entry={entry} />

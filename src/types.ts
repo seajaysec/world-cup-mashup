@@ -31,6 +31,13 @@ export interface RosterEntry {
   flag: string
   /** True for the for-fun picks that aren't actually in the World Cup. */
   joke?: boolean
+  /**
+   * Teams this member previously held and gave up (e.g. after a knockout), most
+   * recent last. When Chris re-assigns someone, move their old team here and set
+   * `team`/`flag` to the new pick. Purely informational — ownership always comes
+   * from the current `team`.
+   */
+  formerTeams?: string[]
 }
 
 /** Static metadata about a real World Cup team. */

@@ -1,18 +1,20 @@
 import { useEffect, useMemo, useState } from 'react'
-import { canonicalTeamName } from './data/teams'
+import { canonicalTeamName, TEAMS } from './data/teams'
 import { loadFeed, type LoadedFeed } from './lib/feed'
 import { derive, rosterByMember } from './lib/derive'
 import {
   clearClaimedMember,
+  clearRepick,
   getClaimedMember,
+  getRepicks,
   setClaimedMember as persistClaim,
+  setRepick,
 } from './lib/format'
 import { Tabs, type TabKey } from './components/Tabs'
 import { ClaimPicker } from './components/ClaimPicker'
 import { MyTeamView } from './components/views/MyTeamView'
 import { LeaderboardView } from './components/views/LeaderboardView'
 import { BracketView } from './components/views/BracketView'
-import { RosterView } from './components/views/RosterView'
 import { ScheduleView } from './components/views/ScheduleView'
 import styles from './styles/app.module.css'
 
@@ -32,6 +34,7 @@ export function App() {
   const [failed, setFailed] = useState(false)
   const [tab, setTab] = useState<TabKey>('me')
   const [claimedMember, setClaim] = useState<string | null>(() => getClaimedMember())
+  const [repicks, setRepicks] = useState<Record<string, string>>(() => getRepicks())
 
   useEffect(() => {
     let active = true
@@ -55,9 +58,29 @@ export function App() {
     clearClaimedMember()
     setClaim(null)
   }
+  function repick(team: string) {
+    if (!claimedMember) return
+    setRepick(claimedMember, team)
+    setRepicks(getRepicks())
+  }
+  function clearMyRepick() {
+    if (!claimedMember) return
+    clearRepick(claimedMember)
+    setRepicks(getRepicks())
+  }
 
   const claimedRoster = rosterByMember(claimedMember)
   const myTeam = claimedRoster && !claimedRoster.joke ? canonicalTeamName(claimedRoster.team) : null
+
+  // Unpicked teams still alive — the valid replacement pool for re-picks.
+  const available = useMemo(() => {
+    if (!derived) return []
+    return TEAMS.filter((t) => {
+      if (derived.ownerByTeam.has(t.name)) return false
+      const status = derived.progressByTeam.get(t.name)?.status
+      return status === 'alive' || status === 'champion'
+    }).sort((a, b) => a.name.localeCompare(b.name))
+  }, [derived])
 
   return (
     <div className="app-shell">
@@ -111,6 +134,10 @@ export function App() {
               onClaim={claim}
               claimedMember={claimedMember}
               joke={claimedMember ? derived.jokeByMember.get(claimedMember) : undefined}
+              available={available}
+              repickTeam={claimedMember ? repicks[claimedMember] : undefined}
+              onRepick={repick}
+              onClearRepick={clearMyRepick}
             />
           )}
           {tab === 'leaderboard' && (
@@ -118,18 +145,12 @@ export function App() {
               leaderboard={derived.leaderboard}
               claimedMember={claimedMember}
               jokeByMember={derived.jokeByMember}
+              progressByTeam={derived.progressByTeam}
+              ownerByTeam={derived.ownerByTeam}
             />
           )}
           {tab === 'bracket' && (
             <BracketView matches={derived.matches} owners={derived.ownerByTeam} myTeam={myTeam} />
-          )}
-          {tab === 'roster' && (
-            <RosterView
-              leaderboard={derived.leaderboard}
-              familyTeams={derived.familyTeams}
-              claimedMember={claimedMember}
-              jokeByMember={derived.jokeByMember}
-            />
           )}
           {tab === 'schedule' && (
             <ScheduleView matches={derived.matches} owners={derived.ownerByTeam} myTeam={myTeam} />

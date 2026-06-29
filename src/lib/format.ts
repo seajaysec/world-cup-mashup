@@ -96,3 +96,41 @@ export function clearClaimedMember(): void {
     /* no-op */
   }
 }
+
+/**
+ * Provisional re-picks: when a member's team is knocked out they can pencil in a
+ * replacement locally (per browser) before Chris makes it official in the
+ * roster. Stored separately from the official roster and the claim, so it never
+ * conflicts with the canonical picks — it's just a personal note + a nudge to
+ * message Chris.
+ */
+const REPICK_KEY = 'wc2026.repicks'
+
+export function getRepicks(): Record<string, string> {
+  try {
+    const raw = localStorage.getItem(REPICK_KEY)
+    return raw ? (JSON.parse(raw) as Record<string, string>) : {}
+  } catch {
+    return {}
+  }
+}
+
+export function setRepick(member: string, team: string): void {
+  try {
+    const all = getRepicks()
+    all[member] = team
+    localStorage.setItem(REPICK_KEY, JSON.stringify(all))
+  } catch {
+    /* storage disabled — provisional pick simply won't persist */
+  }
+}
+
+export function clearRepick(member: string): void {
+  try {
+    const all = getRepicks()
+    delete all[member]
+    localStorage.setItem(REPICK_KEY, JSON.stringify(all))
+  } catch {
+    /* no-op */
+  }
+}

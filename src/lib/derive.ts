@@ -1,6 +1,6 @@
 import type { FeedMatch, RosterEntry, TeamProgress } from '../types'
 import { ROSTER } from '../data/roster'
-import { canonicalTeamName } from '../data/teams'
+import { canonicalTeamName, TEAMS } from '../data/teams'
 import { computeAllProgress, resolveMatches } from './progress'
 import { buildLeaderboard, type LeaderboardEntry } from './leaderboard'
 import { computeJokeProgress, isJokeTeam, type JokeProgress } from './joke'
@@ -26,8 +26,10 @@ export interface Derived {
 /** Crunch the raw feed into everything the views need. Pure + memo-friendly. */
 export function derive(rawMatches: FeedMatch[], now: Date): Derived {
   const matches = resolveMatches(rawMatches)
+  // Compute progress for everyone in the roster *and* every World Cup team, so
+  // the "up for grabs" pool knows which unpicked teams are still alive.
   const progressByTeam = computeAllProgress(
-    ROSTER.map((r) => r.team),
+    [...ROSTER.map((r) => r.team), ...TEAMS.map((t) => t.name)],
     matches,
   )
   const leaderboard = buildLeaderboard(ROSTER, progressByTeam)

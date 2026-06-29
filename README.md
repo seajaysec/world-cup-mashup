@@ -5,8 +5,11 @@ person picked a team; this shows how everyone's doing, who's still in it, who's
 out, what's coming up, and who's winning (or losing) the family prizes.
 
 - **My Team** — pick your name (remembered in your browser only, no accounts) to
-  follow your team: status, next match, favoredness, and your rank. If your team
-  is knocked out, you can pencil in a still-alive replacement here.
+  follow your team: status, next match, favoredness, and your rank. It also shows
+  a "just for fun" card of where your country ranks in the world on a handful of
+  [Our World in Data](https://ourworldindata.org) metrics, plus a SOCCER row with
+  the team's live Elo and trend. If your team is knocked out, you can scout a
+  still-alive replacement (with the same stats) before you commit.
 - **Standings** rank everyone best → worst. The top is on track to **win it all**
   (👑); the bottom is the wooden spoon for **losing the whole thing** (🥄). Also
   lists owners who need a new team, the teams still up for grabs, and any re-pick
@@ -93,6 +96,24 @@ npm run preview    # preview the production build
 
 The ranking and elimination logic is covered by tests in `test/` that run
 against the bundled snapshot.
+
+### Refreshing the "just for fun" country stats
+
+The My Team country-ranking card is baked from Our World in Data at build time
+into `src/data/owid-stats.json` (one global rank per metric per World Cup
+country). To refresh it:
+
+```bash
+npm run fetch:owid
+```
+
+This pulls the latest values from the OWID grapher CSV endpoints. Sources are
+the V-Dem electoral-democracy index, World Bank GDP per capita, life expectancy,
+the World Happiness Report (Cantril ladder), the UN Gender Inequality Index,
+consumption-based CO₂ per capita, gross public-sector debt, military expenditure,
+and population — each linked from the card. (EIU's Democracy Index is
+non-redistributable, so V-Dem's open index is used instead. The OWID feed has no
+save/possession data, so the Soccer row is our own live Elo.)
 
 ## Deploy (GitHub Pages)
 

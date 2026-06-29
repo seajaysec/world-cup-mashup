@@ -764,6 +764,86 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* ---- Country stats (OWID, just for fun) --------------------------------- */
+.owidList {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.owidRow {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+}
+.owidRow + .owidRow {
+  border-top: 1px solid var(--color-border);
+}
+.owidTitle {
+  font-weight: 600;
+  color: var(--color-text);
+  text-decoration: none;
+  min-width: 0;
+}
+a.owidTitle {
+  border-bottom: 1px dotted var(--color-text-faint);
+}
+.owidValue {
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+.owidTrend {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.owidDelta {
+  color: var(--color-text-faint);
+  font-size: 0.78rem;
+}
+.sparkline {
+  display: block;
+}
+.owidRank {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-align: right;
+  min-width: 3.4rem;
+}
+.owidTotal {
+  color: var(--color-text-faint);
+  font-weight: 400;
+  font-size: 0.78rem;
+}
+.owidRankNone {
+  color: var(--color-text-faint);
+  font-size: 0.78rem;
+  white-space: nowrap;
+  min-width: 3.4rem;
+  text-align: right;
+}
+.rankGood {
+  color: var(--color-alive);
+}
+.rankMid {
+  color: var(--color-text);
+}
+.rankBad {
+  color: var(--color-out);
+}
+.owidSource {
+  color: var(--color-text-faint);
+  font-size: 0.72rem;
+  margin: var(--space-3) 0 0;
+}
+
 /* ---- Re-pick ------------------------------------------------------------- */
 .repickCard {
   border-color: color-mix(in srgb, var(--color-info) 40%, var(--color-border));

@@ -1,15 +1,18 @@
+import { useState } from 'react'
 import type { FeedMatch, TeamMeta } from '../../types'
 import type { LeaderboardEntry } from '../../lib/leaderboard'
 import type { JokeProgress } from '../../lib/joke'
 import { formatOdds, getTeamMeta, TIER_LABELS } from '../../data/teams'
 import { formatKickoff, formatSlot, isPlaceholder } from '../../lib/format'
 import { StatusBadge, TierBadge } from '../Badges'
+import { CountryStats } from '../CountryStats'
 import { useFavor } from '../FavorContext'
 import { ClaimPicker } from '../ClaimPicker'
 import { JokeCard } from '../JokeCard'
 import styles from '../../styles/app.module.css'
 
-/** When your team is out, pencil in a still-alive replacement (local only). */
+/** When your team is out, pencil in a still-alive replacement (local only). You
+ * can scout a candidate's country stats before committing. */
 function RepickPanel({
   member,
   deadTeam,
@@ -25,12 +28,14 @@ function RepickPanel({
   onRepick: (team: string) => void
   onClearRepick: () => void
 }) {
-  const repickMeta = repickTeam ? getTeamMeta(repickTeam) : undefined
-  return (
-    <div className={`${styles.card} ${styles.repickCard}`}>
-      <div className={styles.sectionTitle}>Pick a replacement</div>
-      {repickTeam ? (
-        <>
+  const [preview, setPreview] = useState('')
+
+  if (repickTeam) {
+    const repickMeta = getTeamMeta(repickTeam)
+    return (
+      <>
+        <div className={`${styles.card} ${styles.repickCard}`}>
+          <div className={styles.sectionTitle}>Your replacement pick</div>
           <div className={styles.nextOpponent}>
             {repickMeta?.flag ?? '🆕'} {repickTeam}
           </div>
@@ -57,33 +62,50 @@ function RepickPanel({
               Clear
             </button>
           </div>
-        </>
-      ) : (
-        <>
-          <p className={styles.muted}>
-            {deadTeam} is out. Choose a still-alive team nobody owns to pencil in as your new pick,
-            then tell Chris.
-          </p>
-          <label>
-            <span className="visually-hidden">Choose a replacement team</span>
-            <select
-              className={styles.select}
-              defaultValue=""
-              onChange={(e) => e.target.value && onRepick(e.target.value)}
-            >
-              <option value="" disabled>
-                {available.length ? 'Pick a replacement…' : 'No teams available right now'}
+        </div>
+        <CountryStats team={repickTeam} heading={`Where ${repickTeam} ranks in the world`} />
+      </>
+    )
+  }
+
+  return (
+    <>
+      <div className={`${styles.card} ${styles.repickCard}`}>
+        <div className={styles.sectionTitle}>Pick a replacement</div>
+        <p className={styles.muted}>
+          {deadTeam} is out. Scout a still-alive team nobody owns — check how they stack up below —
+          then lock it in and tell Chris.
+        </p>
+        <label>
+          <span className="visually-hidden">Scout a replacement team</span>
+          <select
+            className={styles.select}
+            value={preview}
+            onChange={(e) => setPreview(e.target.value)}
+          >
+            <option value="" disabled>
+              {available.length ? 'Scout a replacement…' : 'No teams available right now'}
+            </option>
+            {available.map((t) => (
+              <option key={t.name} value={t.name}>
+                {t.flag} {t.name}
               </option>
-              {available.map((t) => (
-                <option key={t.name} value={t.name}>
-                  {t.flag} {t.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        </>
-      )}
-    </div>
+            ))}
+          </select>
+        </label>
+        {preview && (
+          <button
+            type="button"
+            className={styles.primaryButton}
+            style={{ marginTop: 'var(--space-3)' }}
+            onClick={() => onRepick(preview)}
+          >
+            Make {preview} my pick
+          </button>
+        )}
+      </div>
+      {preview && <CountryStats team={preview} heading={`Scouting ${preview}`} />}
+    </>
   )
 }
 
@@ -231,6 +253,8 @@ export function MyTeamView({
       )}
 
       <GroupRecord entry={entry} />
+
+      <CountryStats team={roster.team} />
     </>
   )
 }

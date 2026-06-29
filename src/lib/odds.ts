@@ -27,6 +27,11 @@ export interface FavorInfo {
   tier: Tier
   /** The pre-tournament prior odds, for "from X% before kickoff" context. */
   priorOdds: number
+  /** Rating after each played match (history[0] is the pre-tournament seed). */
+  history: number[]
+  /** Rank by current rating among all World Cup teams (1 = strongest). */
+  eloRank: number
+  eloTotal: number
 }
 
 /** Map curated prior odds (%) to a starting Elo. Monotonic; ~1234–1805 range. */
@@ -52,7 +57,12 @@ export function computeFavor(
   progressByTeam: Map<string, TeamProgress>,
 ): Map<string, FavorInfo> {
   const rating = new Map<string, number>()
-  for (const t of TEAMS) rating.set(t.name, baseElo(t.odds))
+  const history = new Map<string, number[]>()
+  for (const t of TEAMS) {
+    const base = baseElo(t.odds)
+    rating.set(t.name, base)
+    history.set(t.name, [base])
+  }
 
   // Replay played matches in chronological order so ratings compound correctly.
   const played = matches
@@ -74,6 +84,8 @@ export function computeFavor(
     const delta = k * (scoreA - expectedA)
     rating.set(a, Ra + delta)
     rating.set(b, Rb - delta)
+    history.get(a)!.push(Ra + delta)
+    history.get(b)!.push(Rb - delta)
   }
 
   let champion: string | undefined
@@ -87,6 +99,14 @@ export function computeFavor(
     }
   }
 
+  // Elo ranks across the whole field (strongest first), regardless of alive/out.
+  const rankOrder = [...rating.entries()]
+    .filter(([name]) => getTeamMeta(name))
+    .sort((a, b) => b[1] - a[1])
+  const eloTotal = rankOrder.length
+  const eloRank = new Map<string, number>()
+  rankOrder.forEach(([name], idx) => eloRank.set(name, idx + 1))
+
   const info = new Map<string, FavorInfo>()
   for (const [name, r] of rating) {
     const meta = getTeamMeta(name)
@@ -95,7 +115,15 @@ export function computeFavor(
     let odds = 0
     if (champion) odds = name === champion ? 100 : 0
     else if (status === 'alive' && denom > 0) odds = (100 * Math.exp((r - 1500) / SOFTMAX_SCALE)) / denom
-    info.set(name, { rating: r, odds, tier: tierForOdds(odds), priorOdds: meta.odds })
+    info.set(name, {
+      rating: r,
+      odds,
+      tier: tierForOdds(odds),
+      priorOdds: meta.odds,
+      history: history.get(name) ?? [r],
+      eloRank: eloRank.get(name) ?? eloTotal,
+      eloTotal,
+    })
   }
   return info
 }

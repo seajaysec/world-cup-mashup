@@ -1,9 +1,11 @@
 import type { FeedMatch } from '../../types'
 import type { LeaderboardEntry } from '../../lib/leaderboard'
+import type { JokeProgress } from '../../lib/joke'
 import { getTeamMeta } from '../../data/teams'
 import { formatKickoff, formatSlot, isPlaceholder } from '../../lib/format'
 import { StatusBadge, TierBadge } from '../Badges'
 import { ClaimPicker } from '../ClaimPicker'
+import { JokeCard } from '../JokeCard'
 import styles from '../../styles/app.module.css'
 
 function NextMatch({ match, team }: { match: FeedMatch; team: string }) {
@@ -55,11 +57,13 @@ export function MyTeamView({
   total,
   onClaim,
   claimedMember,
+  joke,
 }: {
   entry: LeaderboardEntry | undefined
   total: number
   onClaim: (member: string) => void
   claimedMember: string | null
+  joke: JokeProgress | undefined
 }) {
   if (!entry) {
     return (
@@ -75,6 +79,12 @@ export function MyTeamView({
   }
 
   const { roster, progress } = entry
+
+  // For-fun picks get their own silly evolving season instead of a WC card.
+  if (roster.joke && joke) {
+    return <JokeCard joke={joke} member={roster.member} />
+  }
+
   const meta = getTeamMeta(roster.team)
 
   return (

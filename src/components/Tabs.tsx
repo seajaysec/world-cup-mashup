@@ -1,10 +1,11 @@
 import styles from '../styles/app.module.css'
 
-export type TabKey = 'me' | 'leaderboard' | 'roster' | 'schedule'
+export type TabKey = 'me' | 'leaderboard' | 'bracket' | 'roster' | 'schedule'
 
 const TABS: { key: TabKey; label: string; icon: string }[] = [
   { key: 'me', label: 'My Team', icon: '⭐' },
   { key: 'leaderboard', label: 'Standings', icon: '🏆' },
+  { key: 'bracket', label: 'Bracket', icon: '🗺️' },
   { key: 'roster', label: 'Roster', icon: '👪' },
   { key: 'schedule', label: 'Schedule', icon: '📅' },
 ]

@@ -11,6 +11,7 @@ import { Tabs, type TabKey } from './components/Tabs'
 import { ClaimPicker } from './components/ClaimPicker'
 import { MyTeamView } from './components/views/MyTeamView'
 import { LeaderboardView } from './components/views/LeaderboardView'
+import { BracketView } from './components/views/BracketView'
 import { RosterView } from './components/views/RosterView'
 import { ScheduleView } from './components/views/ScheduleView'
 import styles from './styles/app.module.css'
@@ -42,7 +43,8 @@ export function App() {
     }
   }, [])
 
-  const derived = useMemo(() => (loaded ? derive(loaded.feed.matches) : null), [loaded])
+  // Capture "now" once per load so the joke seasons and schedule are stable for the render.
+  const derived = useMemo(() => (loaded ? derive(loaded.feed.matches, new Date()) : null), [loaded])
 
   function claim(member: string) {
     persistClaim(member)
@@ -108,20 +110,29 @@ export function App() {
               total={derived.leaderboard.length}
               onClaim={claim}
               claimedMember={claimedMember}
+              joke={claimedMember ? derived.jokeByMember.get(claimedMember) : undefined}
             />
           )}
           {tab === 'leaderboard' && (
-            <LeaderboardView leaderboard={derived.leaderboard} claimedMember={claimedMember} />
+            <LeaderboardView
+              leaderboard={derived.leaderboard}
+              claimedMember={claimedMember}
+              jokeByMember={derived.jokeByMember}
+            />
+          )}
+          {tab === 'bracket' && (
+            <BracketView matches={derived.matches} owners={derived.ownerByTeam} myTeam={myTeam} />
           )}
           {tab === 'roster' && (
             <RosterView
               leaderboard={derived.leaderboard}
               familyTeams={derived.familyTeams}
               claimedMember={claimedMember}
+              jokeByMember={derived.jokeByMember}
             />
           )}
           {tab === 'schedule' && (
-            <ScheduleView matches={derived.matches} family={derived.familyTeams} myTeam={myTeam} />
+            <ScheduleView matches={derived.matches} owners={derived.ownerByTeam} myTeam={myTeam} />
           )}
 
           {loaded && <p className={styles.feedNote}>{feedNote(loaded)}</p>}

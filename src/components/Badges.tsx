@@ -34,3 +34,13 @@ export function TierBadge({ tier }: { tier: Tier }) {
     </span>
   )
 }
+
+/** Shows which family member owns a team. Render nothing for unowned teams. */
+export function OwnerChip({ member, flag }: { member: string; flag?: string }) {
+  return (
+    <span className={styles.ownerChip} title={`${member}'s pick`}>
+      <span aria-hidden>{flag ?? '👤'}</span>
+      {member}
+    </span>
+  )
+}

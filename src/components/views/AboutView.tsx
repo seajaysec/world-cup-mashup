@@ -81,8 +81,9 @@ export function AboutView({ onBack }: { onBack: () => void }) {
         team beating another family member&apos;s team in a real match (a penalty-shootout win
         counts; a true draw doesn&apos;t). A 💀 <strong>knock-out</strong> is one of your teams going
         out — by anyone, family or not — because in a pick&apos;em, your team being eliminated is the
-        loss that matters. The member with the most knock-outs is the 🥄 biggest loser. Head-to-head
-        losses to other family members are shown too, as bragging-rights flavour.
+        loss that matters. The member with the most knock-outs is the 🥄 biggest loser. (A family
+        member you beat appears as your kill on your own card, so there&apos;s no separate
+        “you lost to so-and-so” counter to muddy the picture.)
       </p>
       <p className={styles.muted}>
         Every result is credited to whoever owned the team <em>on the day it was played</em> — so

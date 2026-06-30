@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import type { RosterEntry, TeamProgress } from '../src/types'
 import { computeFeuds, computeSpoons } from '../src/lib/feuds'
 import { computeAllProgress } from '../src/lib/progress'
 import { ROSTER } from '../src/data/roster'
@@ -62,5 +63,45 @@ describe('computeSpoons (wooden spoons rack up)', () => {
 
   it('excludes joke picks from the spoon race', () => {
     expect(spoons.some((s) => s.member === 'Harlan' || s.member === 'Charlie')).toBe(false)
+  })
+})
+
+describe('computeSpoons — who knocked them out (loser side of a feud)', () => {
+  const roster: RosterEntry[] = [
+    { member: 'Kyle', team: 'Netherlands', flag: '🇳🇱' },
+    { member: 'Carol', team: 'Morocco', flag: '🇲🇦' },
+    { member: 'Elizabeth', team: 'Germany', flag: '🇩🇪' },
+  ]
+  const exit = (opponent: string, date = '2026-06-30') => ({
+    opponent,
+    opponentFlag: '🏳️',
+    scoreFor: 0,
+    scoreAgainst: 2,
+    pens: false,
+    round: 'Round of 32',
+    date,
+  })
+  const progress = new Map<string, TeamProgress>([
+    [
+      'Netherlands',
+      { team: 'Netherlands', status: 'out', stage: 'round32', standingLabel: '', exit: exit('Morocco') } as TeamProgress,
+    ],
+    ['Morocco', { team: 'Morocco', status: 'alive', stage: 'round16', standingLabel: '' } as TeamProgress],
+    // Germany went out to a non-family team.
+    [
+      'Germany',
+      { team: 'Germany', status: 'out', stage: 'round32', standingLabel: '', exit: exit('Paraguay') } as TeamProgress,
+    ],
+  ])
+  const result = computeSpoons(roster, progress)
+
+  it('names the family member when a family team did the knocking-out', () => {
+    const kyle = result.find((s) => s.member === 'Kyle')!
+    expect(kyle.deadTeams[0].byMember).toBe('Carol') // Carol owns Morocco
+  })
+
+  it('leaves byMember undefined when a non-family team did it', () => {
+    const eliz = result.find((s) => s.member === 'Elizabeth')!
+    expect(eliz.deadTeams[0].byMember).toBeUndefined()
   })
 })

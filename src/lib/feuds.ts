@@ -95,6 +95,10 @@ export function computeFeuds(roster: readonly RosterEntry[], matches: FeedMatch[
 export interface DeadTeam {
   team: string
   exit?: TeamProgress['exit']
+  /** The family member who owned the team that knocked them out (on the match
+   * day), when the conqueror was itself a family pick — that's the other half of
+   * a feud, shown on the loser's card. Undefined if a non-family team did it. */
+  byMember?: string
 }
 
 /** A member's running wooden-spoon tally. */
@@ -115,11 +119,15 @@ export function computeSpoons(
   roster: readonly RosterEntry[],
   progressByTeam: Map<string, TeamProgress>,
 ): SpoonTally[] {
+  const ownerOf = buildOwnerResolver(roster)
   const tallies: SpoonTally[] = []
-  const toDead = (team: string): DeadTeam => ({
-    team: canonicalTeamName(team),
-    exit: progressByTeam.get(canonicalTeamName(team))?.exit,
-  })
+  const toDead = (team: string): DeadTeam => {
+    const canon = canonicalTeamName(team)
+    const exit = progressByTeam.get(canon)?.exit
+    // If a family pick did the knocking-out, name them (the loser's side of a feud).
+    const byMember = exit ? ownerOf(exit.opponent, exit.date)?.member : undefined
+    return { team: canon, exit, byMember }
+  }
   for (const entry of roster) {
     if (entry.joke) continue
     const dead = [...(entry.formerTeams ?? []).map((f) => toDead(f.team))]

@@ -41,11 +41,26 @@ function ScoreLine({
   )
 }
 
-function deadLine(d: DeadTeam): string {
-  if (!d.exit) return `${d.team} — didn’t make it out of the group stage`
+function DeadLine({ d }: { d: DeadTeam }) {
+  if (!d.exit) return <>{d.team} — didn’t make it out of the group stage</>
   const e = d.exit
   const pens = e.pens ? ' on pens' : ''
-  return `${d.team} — knocked out by ${e.opponentFlag} ${e.opponent} (${e.round}, ${e.scoreFor}–${e.scoreAgainst}${pens}) · ${shortDate(e.date)}`
+  return (
+    <>
+      {d.team} — knocked out by{' '}
+      {d.byMember ? (
+        <>
+          <strong>{d.byMember}</strong>’s {e.opponentFlag} {e.opponent}
+        </>
+      ) : (
+        <>
+          {e.opponentFlag} {e.opponent}
+        </>
+      )}{' '}
+      ({e.round}, {e.scoreFor}–{e.scoreAgainst}
+      {pens}) · {shortDate(e.date)}
+    </>
+  )
 }
 
 export function FeudsView({
@@ -155,7 +170,9 @@ export function FeudsView({
                     </div>
                     <ul className={styles.feudLines}>
                       {r.deadTeams.map((d, i) => (
-                        <li key={i}>{deadLine(d)}</li>
+                        <li key={i}>
+                          <DeadLine d={d} />
+                        </li>
                       ))}
                     </ul>
                   </div>

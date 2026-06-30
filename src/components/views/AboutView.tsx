@@ -77,11 +77,17 @@ export function AboutView({ onBack }: { onBack: () => void }) {
 
       <h2 className={styles.sectionTitle}>Family feuds (the body count)</h2>
       <p>
-        On the <strong>Feuds</strong> tab, whenever your team beats another family member&apos;s team
-        in a real match, that&apos;s a “kill”. Crucially, each result is credited to whoever owned
-        the team <em>on the day it was played</em> — so when someone re-picks, their old team&apos;s
-        earlier games stay on their record, and a freshly-picked team&apos;s past games aren&apos;t
-        back-credited. Draws don&apos;t count.
+        On the <strong>Feuds</strong> tab, two things are tracked. A ⚔️ <strong>kill</strong> is your
+        team beating another family member&apos;s team in a real match (a penalty-shootout win
+        counts; a true draw doesn&apos;t). A 💀 <strong>knock-out</strong> is one of your teams going
+        out — by anyone, family or not — because in a pick&apos;em, your team being eliminated is the
+        loss that matters. The member with the most knock-outs is the 🥄 biggest loser. Head-to-head
+        losses to other family members are shown too, as bragging-rights flavour.
+      </p>
+      <p className={styles.muted}>
+        Every result is credited to whoever owned the team <em>on the day it was played</em> — so
+        when someone re-picks, their old team&apos;s earlier games stay on their record and a
+        freshly-picked team&apos;s past games aren&apos;t back-credited.
       </p>
 
       <h2 className={styles.sectionTitle}>The for-fun picks</h2>

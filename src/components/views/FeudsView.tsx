@@ -11,8 +11,8 @@ function shortDate(date: string): string {
 interface Row {
   member: string
   kills: Defeat[]
-  defeats: Defeat[]
-  spoons: number
+  beatenBy: Defeat[]
+  knockouts: number
   deadTeams: DeadTeam[]
 }
 
@@ -62,7 +62,7 @@ export function FeudsView({
   const ensure = (member: string): Row => {
     let r = rows.get(member)
     if (!r) {
-      r = { member, kills: [], defeats: [], spoons: 0, deadTeams: [] }
+      r = { member, kills: [], beatenBy: [], knockouts: 0, deadTeams: [] }
       rows.set(member, r)
     }
     return r
@@ -70,46 +70,46 @@ export function FeudsView({
   for (const rec of feuds.records) {
     const r = ensure(rec.member)
     r.kills = rec.wins
-    r.defeats = rec.losses
+    r.beatenBy = rec.losses
   }
   for (const s of spoons) {
     const r = ensure(s.member)
-    r.spoons = s.count
+    r.knockouts = s.count
     r.deadTeams = s.deadTeams
   }
 
-  // Sort by kills (desc); defeats and spoons drag you down (asc); then name.
+  // Ranked by kills (desc). Getting knocked out drags you down; head-to-head
+  // losses are the final nudge.
   const list = [...rows.values()].sort(
     (a, b) =>
       b.kills.length - a.kills.length ||
-      a.defeats.length - b.defeats.length ||
-      a.spoons - b.spoons ||
+      a.knockouts - b.knockouts ||
+      a.beatenBy.length - b.beatenBy.length ||
       a.member.localeCompare(b.member),
   )
 
   const maxKills = Math.max(0, ...list.map((r) => r.kills.length))
   const ruthlessUnique = maxKills > 0 && list.filter((r) => r.kills.length === maxKills).length === 1
-  const maxSpoons = Math.max(0, ...list.map((r) => r.spoons))
-  const loserUnique = maxSpoons > 0 && list.filter((r) => r.spoons === maxSpoons).length === 1
+  const maxKo = Math.max(0, ...list.map((r) => r.knockouts))
+  const loserUnique = maxKo > 0 && list.filter((r) => r.knockouts === maxKo).length === 1
 
   return (
     <section>
       <h2 className={styles.sectionTitle}>⚔️ Body count</h2>
       <p className={styles.muted} style={{ marginTop: 0, fontSize: '0.85rem' }}>
-        Ranked by kills (defeats and spoons drag you down). A <strong>kill</strong> is beating
-        another family member&apos;s team in a real match — credited to whoever owned the team{' '}
-        <em>that day</em>, so re-picks are fair (a penalty-shootout win counts; a true draw
-        doesn&apos;t). 🥄 <strong>Wooden spoons</strong> are your knocked-out teams; the most is the
-        biggest loser.
+        ⚔️ A <strong>kill</strong> is your team beating another family member&apos;s team — credited
+        to whoever owned it <em>that day</em>, so re-picks are fair (a penalty-shootout win counts).
+        💀 A <strong>knock-out</strong> is one of your teams going out, by anyone — that&apos;s your
+        loss in the pick&apos;em. Most knock-outs is the 🥄 biggest loser.
       </p>
 
       {list.length === 0 ? (
-        <p className={styles.muted}>No clashes or spoons yet — it&apos;s early.</p>
+        <p className={styles.muted}>Nothing yet — it&apos;s early.</p>
       ) : (
         <div className={styles.matchList}>
           {list.map((r) => {
             const ruthless = ruthlessUnique && r.kills.length === maxKills
-            const biggestLoser = loserUnique && r.spoons === maxSpoons
+            const biggestLoser = loserUnique && r.knockouts === maxKo
             return (
               <div
                 key={r.member}
@@ -118,18 +118,18 @@ export function FeudsView({
                 <div className={styles.feudHead}>
                   <span className={styles.feudName}>
                     {ruthless && '🔪 '}
+                    {biggestLoser && '🥄 '}
                     {r.member}
                   </span>
                   <span className={styles.feudTally}>
                     <span className={styles.feudWins}>⚔️ {r.kills.length}</span>
-                    <span className={styles.feudLosses}>💀 {r.defeats.length}</span>
-                    {r.spoons > 0 && <span className={styles.feudSpoons}>🥄 {r.spoons}</span>}
+                    <span className={styles.feudLosses}>💀 {r.knockouts}</span>
                   </span>
                 </div>
 
                 {r.kills.length > 0 && (
                   <div className={styles.feudSection}>
-                    <div className={styles.feudSub}>Kills</div>
+                    <div className={styles.feudSub}>⚔️ Kills</div>
                     <ul className={styles.feudLines}>
                       {r.kills.map((d, i) => (
                         <li key={i}>
@@ -150,11 +150,25 @@ export function FeudsView({
                   </div>
                 )}
 
-                {r.defeats.length > 0 && (
+                {r.knockouts > 0 && (
                   <div className={styles.feudSection}>
-                    <div className={styles.feudSub}>Defeats</div>
+                    <div className={styles.feudSub}>
+                      💀 Knocked out{' '}
+                      {biggestLoser && <span className={styles.muted}>· 🥄 biggest loser (so far)</span>}
+                    </div>
                     <ul className={styles.feudLines}>
-                      {r.defeats.map((d, i) => (
+                      {r.deadTeams.map((d, i) => (
+                        <li key={i}>{deadLine(d)}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {r.beatenBy.length > 0 && (
+                  <div className={styles.feudSection}>
+                    <div className={styles.feudSub}>Head-to-head losses (bragging rights)</div>
+                    <ul className={styles.feudLines}>
+                      {r.beatenBy.map((d, i) => (
                         <li key={i}>
                           lost to <strong>{d.winnerMember}</strong> ·{' '}
                           <ScoreLine
@@ -168,20 +182,6 @@ export function FeudsView({
                           />
                           <span className={styles.feudWhen}> · {d.group ?? d.round} · {shortDate(d.date)}</span>
                         </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {r.spoons > 0 && (
-                  <div className={styles.feudSection}>
-                    <div className={styles.feudSub}>
-                      🥄 Wooden spoons{' '}
-                      {biggestLoser && <span className={styles.muted}>· biggest loser (so far)</span>}
-                    </div>
-                    <ul className={styles.feudLines}>
-                      {r.deadTeams.map((d, i) => (
-                        <li key={i}>{deadLine(d)}</li>
                       ))}
                     </ul>
                   </div>

@@ -4,6 +4,8 @@ import { canonicalTeamName, getTeamMeta } from '../../data/teams'
 import { formatKickoff, parseKickoff, winnerSide, wasShootout } from '../../lib/format'
 import { happyIcon, sadIcon } from '../../lib/icons'
 import { buildSlotResolver, computeGroupTables, type Slot } from '../../lib/bracket'
+import { buildOwnerResolver } from '../../lib/ownership'
+import { ROSTER } from '../../data/roster'
 import { FavorMark, OwnerChip } from '../Badges'
 import styles from '../../styles/app.module.css'
 
@@ -47,7 +49,7 @@ function KoSlot({
   isWinner,
   isLoser,
   mood,
-  owners,
+  owner,
   myTeam,
 }: {
   slot: Slot
@@ -55,7 +57,8 @@ function KoSlot({
   isWinner: boolean
   isLoser: boolean
   mood?: string
-  owners: Map<string, RosterEntry>
+  /** The family member who owned this team on the match date, if any. */
+  owner?: RosterEntry
   myTeam: string | null
 }) {
   if (slot.kind === 'tbd') {
@@ -88,7 +91,6 @@ function KoSlot({
   }
 
   const team = slot.team
-  const owner = owners.get(canonicalTeamName(team))
   const mine = myTeam === canonicalTeamName(team)
   const classes = [styles.koTeam]
   if (isWinner) classes.push(styles.koWin)
@@ -103,7 +105,7 @@ function KoSlot({
       </span>
       <span className={styles.koName}>{team}</span>
       <FavorMark team={team} />
-      {owner && <OwnerChip member={owner.member} flag={owner.flag} />}
+      {owner && <OwnerChip member={owner.member} />}
       {isWinner && <span className={styles.koResultWin}>WON</span>}
       {isLoser && <span className={styles.koResultOut}>OUT</span>}
       {mood && (
@@ -204,6 +206,7 @@ export function BracketView({
   now: Date
 }) {
   const resolveSlot = useMemo(() => buildSlotResolver(matches), [matches])
+  const ownerOf = useMemo(() => buildOwnerResolver(ROSTER), [])
 
   const rounds = useMemo(
     () =>
@@ -236,7 +239,7 @@ export function BracketView({
   const final = matches.find((m) => m.round === 'Final')
   const finalWin = final ? winnerSide(final) : 0
   const finalWinner = finalWin === 1 ? final!.team1 : finalWin === 2 ? final!.team2 : null
-  const championOwner = finalWinner ? owners.get(canonicalTeamName(finalWinner)) : undefined
+  const championOwner = finalWinner ? ownerOf(finalWinner, final!.date) : undefined
 
   return (
     <section>
@@ -290,9 +293,11 @@ export function BracketView({
                   const seed = match.num ?? i
                   const s1 = resolveSlot(match.team1)
                   const s2 = resolveSlot(match.team2)
-                  const fam =
-                    (s1.kind === 'team' && owners.has(canonicalTeamName(s1.team))) ||
-                    (s2.kind === 'team' && owners.has(canonicalTeamName(s2.team)))
+                  // Who owned each team on the day this game was played (or now,
+                  // for upcoming games) — so a past game shows the right person.
+                  const owner1 = s1.kind === 'team' ? ownerOf(s1.team, match.date) : undefined
+                  const owner2 = s2.kind === 'team' ? ownerOf(s2.team, match.date) : undefined
+                  const fam = Boolean(owner1 || owner2)
                   return (
                     <div
                       key={`${match.num ?? i}`}
@@ -312,7 +317,7 @@ export function BracketView({
                         isWinner={win === 1}
                         isLoser={win === 2}
                         mood={win === 1 ? happyIcon(seed) : win === 2 ? sadIcon(seed) : undefined}
-                        owners={owners}
+                        owner={owner1}
                         myTeam={myTeam}
                       />
                       <KoSlot
@@ -321,7 +326,7 @@ export function BracketView({
                         isWinner={win === 2}
                         isLoser={win === 1}
                         mood={win === 2 ? happyIcon(seed) : win === 1 ? sadIcon(seed) : undefined}
-                        owners={owners}
+                        owner={owner2}
                         myTeam={myTeam}
                       />
                       <div className={styles.koMatchMeta}>

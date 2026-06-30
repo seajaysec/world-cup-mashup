@@ -1,6 +1,7 @@
 import type { FeedMatch, RosterEntry, TeamProgress } from '../types'
 import { canonicalTeamName, getTeamMeta } from '../data/teams'
 import { matchTimeKey, wasShootout, winnerSide } from './format'
+import { buildOwnerResolver } from './ownership'
 
 /** One family-member-beats-another result (a "kill"). */
 export interface Defeat {
@@ -32,50 +33,8 @@ export interface Feuds {
   records: MemberRecord[]
 }
 
-/** A member's ownership of a team over a time window (ms epoch bounds). */
-interface Span {
-  member: string
-  team: string
-  from: number
-  until: number
-}
-
-function dateMs(date: string): number {
-  return new Date(`${date}T00:00:00Z`).getTime()
-}
-
-/**
- * Build every member's ownership timeline. A team is credited to whoever owned
- * it on the match date — so a re-picked team's earlier games stay with its
- * previous owner (and a newly-picked team's *past* games aren't back-credited).
- */
-function buildSpans(roster: readonly RosterEntry[]): Map<string, Span[]> {
-  const byTeam = new Map<string, Span[]>()
-  for (const entry of roster) {
-    if (entry.joke) continue
-    const ordered = [
-      ...(entry.formerTeams ?? []).map((f) => ({ team: f.team, until: dateMs(f.until) })),
-      { team: entry.team, until: Number.POSITIVE_INFINITY },
-    ]
-    let from = Number.NEGATIVE_INFINITY
-    for (const span of ordered) {
-      const team = canonicalTeamName(span.team)
-      const list = byTeam.get(team) ?? []
-      list.push({ member: entry.member, team, from, until: span.until })
-      byTeam.set(team, list)
-      from = span.until
-    }
-  }
-  return byTeam
-}
-
-function ownerAt(byTeam: Map<string, Span[]>, team: string, when: number): string | undefined {
-  const spans = byTeam.get(canonicalTeamName(team))
-  return spans?.find((s) => when >= s.from && when < s.until)?.member
-}
-
 export function computeFeuds(roster: readonly RosterEntry[], matches: FeedMatch[]): Feuds {
-  const byTeam = buildSpans(roster)
+  const ownerOf = buildOwnerResolver(roster)
   const feed: Defeat[] = []
 
   const played = matches
@@ -87,9 +46,8 @@ export function computeFeuds(roster: readonly RosterEntry[], matches: FeedMatch[
     const side = winnerSide(m) // penalty shootouts count (the winner advanced)
     if (side === 0) continue // a genuine draw isn't a kill
     const ft = m.score!.ft!
-    const when = dateMs(m.date)
-    const owner1 = ownerAt(byTeam, m.team1, when)
-    const owner2 = ownerAt(byTeam, m.team2, when)
+    const owner1 = ownerOf(m.team1, m.date)?.member
+    const owner2 = ownerOf(m.team2, m.date)?.member
     if (!owner1 || !owner2 || owner1 === owner2) continue
 
     const team1Won = side === 1

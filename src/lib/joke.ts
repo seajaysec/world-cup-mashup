@@ -1,4 +1,5 @@
 import type { FeedMatch, Tier } from '../types'
+import { localDayKey } from './format'
 
 /**
  * The "just for fun" picks (La Galaxy 🌌, Denver Nuggets 🏀) aren't in the World
@@ -178,7 +179,7 @@ export function computeJokeProgress(team: string, matches: FeedMatch[], now: Dat
 
   const activity = dailyWorldCupActivity(matches)
   const dates = [...activity.keys()].sort()
-  const today = now.toISOString().slice(0, 10)
+  const today = localDayKey(now)
 
   const record = { won: 0, drawn: 0, lost: 0, points: 0, for: 0, against: 0 }
   const played: JokeMatch[] = []

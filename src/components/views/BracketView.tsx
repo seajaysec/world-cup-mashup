@@ -1,7 +1,13 @@
 import { useMemo, useState } from 'react'
 import type { FeedMatch, RosterEntry } from '../../types'
 import { canonicalTeamName, getTeamMeta } from '../../data/teams'
-import { formatKickoff, parseKickoff, winnerSide, wasShootout } from '../../lib/format'
+import {
+  formatKickoff,
+  isSameLocalDay,
+  parseKickoff,
+  winnerSide,
+  wasShootout,
+} from '../../lib/format'
 import { happyIcon, sadIcon } from '../../lib/icons'
 import { buildSlotResolver, computeGroupTables, type Slot } from '../../lib/bracket'
 import { buildOwnerResolver } from '../../lib/ownership'
@@ -29,8 +35,7 @@ function matchStatus(match: FeedMatch, now: Date): { text: string; tone: StatusT
   if (match.score?.ft) return { text: '✓ Played', tone: 'done' }
   const kickoff = parseKickoff(match.date, match.time)
   if (!kickoff) return { text: 'Upcoming', tone: 'soon' }
-  const day = (d: Date) => d.toISOString().slice(0, 10)
-  if (day(kickoff) === day(now)) return { text: '● Playing today', tone: 'today' }
+  if (isSameLocalDay(kickoff, now)) return { text: '● Playing today', tone: 'today' }
   if (kickoff.getTime() < now.getTime()) return { text: 'Awaiting result', tone: 'wait' }
   return { text: 'Upcoming', tone: 'soon' }
 }

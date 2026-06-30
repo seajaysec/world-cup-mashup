@@ -39,6 +39,24 @@ export function wasShootout(match: FeedMatch): boolean {
   return Boolean(ft && ft[0] === ft[1] && match.score?.p)
 }
 
+/**
+ * "YYYY-MM-DD" for an instant in the *viewer's* local timezone. Use this — not
+ * `toISOString().slice(0,10)`, which is the UTC day and can be off by one
+ * (e.g. a US-evening "now" is already tomorrow in UTC) — for any "is this
+ * today?" check, so the answer matches the date the viewer actually sees.
+ */
+export function localDayKey(d: Date): string {
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
+/** True if the kickoff falls on the same local calendar day as `now`. */
+export function isSameLocalDay(a: Date, b: Date): boolean {
+  return localDayKey(a) === localDayKey(b)
+}
+
 /** Sort key for matches in chronological order (date, then time, then number). */
 export function matchTimeKey(match: FeedMatch): number {
   const kickoff = parseKickoff(match.date, match.time)

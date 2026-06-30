@@ -528,6 +528,31 @@
   font-size: 0.72rem;
   margin-top: var(--space-5);
 }
+.alertsBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-4);
+  margin-bottom: var(--space-4);
+}
+.alertsText {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+.todayBanner {
+  background: color-mix(in srgb, var(--color-info) 16%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-info) 45%, var(--color-border));
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+  font-size: 0.9rem;
+}
 .refreshButton {
   background: var(--color-surface-2);
   border: 1px solid var(--color-border);

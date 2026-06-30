@@ -5,11 +5,23 @@ import { derive, rosterByMember } from './lib/derive'
 import {
   clearClaimedMember,
   clearRepick,
+  formatKickoff,
+  formatSlot,
   getClaimedMember,
   getRepicks,
+  isPlaceholder,
+  parseKickoff,
   setClaimedMember as persistClaim,
   setRepick,
 } from './lib/format'
+import {
+  disableNotifications,
+  enableNotifications,
+  notificationsSupported,
+  notifyEnabled,
+  primeBaseline,
+  syncNotifications,
+} from './lib/notify'
 import { Tabs, type TabKey } from './components/Tabs'
 import { FavorProvider } from './components/FavorContext'
 import { ClaimPicker } from './components/ClaimPicker'
@@ -44,6 +56,7 @@ export function App() {
   const [showAbout, setShowAbout] = useState(
     () => typeof window !== 'undefined' && window.location.hash === ABOUT_HASH,
   )
+  const [alertsOn, setAlertsOn] = useState(() => notifyEnabled())
 
   useEffect(() => {
     const onHash = () => setShowAbout(window.location.hash === ABOUT_HASH)
@@ -113,6 +126,46 @@ export function App() {
   const claimedRoster = rosterByMember(claimedMember)
   const myTeam = claimedRoster && !claimedRoster.joke ? canonicalTeamName(claimedRoster.team) : null
 
+  // A heads-up when the claimed member's team kicks off soon (within ~24h).
+  const upcomingSoon = useMemo(() => {
+    if (!derived || !claimedMember || !myTeam) return null
+    const next = derived.entryByMember.get(claimedMember)?.progress.nextMatch
+    if (!next) return null
+    const kick = parseKickoff(next.date, next.time)
+    if (!kick) return null
+    const hours = (kick.getTime() - now.getTime()) / 3_600_000
+    if (hours < -2.5 || hours > 24) return null
+    const oppRaw = canonicalTeamName(next.team1) === myTeam ? next.team2 : next.team1
+    const opponent = isPlaceholder(oppRaw) ? formatSlot(oppRaw) : oppRaw
+    return { team: claimedRoster!.team, opponent, when: formatKickoff(next), live: hours <= 0 }
+  }, [derived, claimedMember, myTeam, now, claimedRoster])
+
+  // Match alerts: while alerts are on, re-check the feed for any family team that
+  // just kicked off or just finished. Results refresh with the feed (hourly / on
+  // focus); start detection runs on a lighter timer so it doesn't lag the clock.
+  useEffect(() => {
+    if (!alertsOn || !derived) return
+    const run = () =>
+      void syncNotifications(derived.matches, derived.familyTeams, derived.ownerByTeam)
+    run()
+    const timer = setInterval(run, 5 * 60 * 1000)
+    return () => clearInterval(timer)
+  }, [alertsOn, derived])
+
+  async function toggleAlerts() {
+    if (alertsOn) {
+      disableNotifications()
+      setAlertsOn(false)
+      return
+    }
+    const ok = await enableNotifications()
+    if (ok && derived) {
+      // Don't replay games that already happened — only alert on what changes now.
+      primeBaseline(derived.matches, derived.familyTeams, derived.ownerByTeam)
+    }
+    setAlertsOn(ok)
+  }
+
   // Unpicked teams still alive — the valid replacement pool for re-picks.
   const available = useMemo(() => {
     if (!derived) return []
@@ -162,6 +215,27 @@ export function App() {
           </>
         )}
       </div>
+
+      {notificationsSupported() && (
+        <div className={styles.alertsBar}>
+          <span className={styles.alertsText}>
+            {alertsOn
+              ? '🔔 Alerts on — you’ll be pinged when any family team kicks off or finishes (while this tab is open).'
+              : '🔕 Get a ping when any family team starts a game or wins/loses.'}
+          </span>
+          <button type="button" className={styles.linkButton} onClick={toggleAlerts}>
+            {alertsOn ? 'Turn off' : 'Turn on alerts'}
+          </button>
+        </div>
+      )}
+
+      {!showAbout && upcomingSoon && (
+        <div className={styles.todayBanner}>
+          🔔 <strong>{upcomingSoon.team}</strong>{' '}
+          {upcomingSoon.live ? 'are playing now' : 'play soon'} — vs {upcomingSoon.opponent} ·{' '}
+          {upcomingSoon.when}
+        </div>
+      )}
 
       {showAbout && <AboutView onBack={closeAbout} />}
 

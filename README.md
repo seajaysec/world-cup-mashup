@@ -102,6 +102,19 @@ npm run preview    # preview the production build
 The ranking and elimination logic is covered by tests in `test/` that run
 against the bundled snapshot.
 
+### Match alerts (browser notifications)
+
+There's no push server — instead, the open page itself does the alerting. Tap
+**🔔 Turn on alerts** on My Team to grant the browser's notification permission,
+and while the tab is open (it refreshes hourly and whenever you return to it) the
+app watches the live feed for **every** family-owned team and fires a local
+notification when one of their games kicks off and again when it finishes (won /
+lost / knocked out). It's all client-side (`src/lib/notify.ts` + a tiny service
+worker at `public/notify-sw.js` so notifications work on mobile); a localStorage
+baseline means you only ever hear about changes from the moment you enabled it,
+never a backlog. (True web-push while the tab is closed isn't possible: a static
+site can't securely collect push subscriptions without a backend.)
+
 ### Refreshing the "just for fun" country stats
 
 The My Team country-ranking card is baked from Our World in Data at build time

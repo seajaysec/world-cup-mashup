@@ -104,6 +104,8 @@ function KoSlot({
       <span className={styles.koName}>{team}</span>
       <FavorMark team={team} />
       {owner && <OwnerChip member={owner.member} flag={owner.flag} />}
+      {isWinner && <span className={styles.koResultWin}>WON</span>}
+      {isLoser && <span className={styles.koResultOut}>OUT</span>}
       {mood && (
         <span aria-hidden className={styles.koMood}>
           {mood}

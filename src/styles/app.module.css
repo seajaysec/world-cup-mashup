@@ -652,6 +652,23 @@
   font-size: 1rem;
   flex: none;
 }
+.koResultWin,
+.koResultOut {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 0.05rem 0.35rem;
+  border-radius: 999px;
+  flex: none;
+}
+.koResultWin {
+  color: var(--color-accent-ink);
+  background: var(--color-alive);
+}
+.koResultOut {
+  color: #fff;
+  background: var(--color-out);
+}
 .koTbd .koName {
   color: var(--color-text-faint);
   font-style: italic;

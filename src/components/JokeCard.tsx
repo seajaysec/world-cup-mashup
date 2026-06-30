@@ -1,4 +1,5 @@
 import type { JokeProgress } from '../lib/joke'
+import { triggerSwirl } from '../lib/swirl'
 import { TierBadge } from './Badges'
 import styles from '../styles/app.module.css'
 
@@ -20,7 +21,20 @@ export function JokeCard({ joke, member }: { joke: JokeProgress; member: string 
 
   return (
     <>
-      <div className={`${styles.card} ${styles.heroCard} ${styles.jokeCard}`}>
+      <div
+        className={`${styles.card} ${styles.heroCard} ${styles.jokeCard} ${styles.jokeTap}`}
+        role="button"
+        tabIndex={0}
+        title={`Tap for a ${joke.emoji} surprise`}
+        aria-label={`${joke.team} — tap for a surprise`}
+        onClick={() => triggerSwirl(joke.emoji)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            triggerSwirl(joke.emoji)
+          }
+        }}
+      >
         <div className={styles.heroTop}>
           <span className={styles.heroFlag} aria-hidden>
             {joke.emoji}

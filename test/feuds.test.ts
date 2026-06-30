@@ -61,6 +61,6 @@ describe('computeSpoons (wooden spoons rack up)', () => {
   })
 
   it('excludes joke picks from the spoon race', () => {
-    expect(spoons.some((s) => s.member === 'Harley' || s.member === 'Charlie')).toBe(false)
+    expect(spoons.some((s) => s.member === 'Harlan' || s.member === 'Charlie')).toBe(false)
   })
 })

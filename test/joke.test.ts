@@ -54,7 +54,7 @@ describe('derive ownership + joke wiring', () => {
   })
 
   it('computes a joke season per owning member', () => {
-    expect(d.jokeByMember.get('Harley')?.team).toBe('Galaxy')
+    expect(d.jokeByMember.get('Harlan')?.team).toBe('Galaxy')
     expect(d.jokeByMember.get('Charlie')?.team).toBe('Denver Nuggets')
   })
 })

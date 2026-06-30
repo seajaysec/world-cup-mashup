@@ -25,6 +25,7 @@ import {
   syncNotifications,
 } from './lib/notify'
 import { Tabs, type TabKey } from './components/Tabs'
+import { EmojiSwirl } from './components/EmojiSwirl'
 import { FavorProvider } from './components/FavorContext'
 import { ClaimPicker } from './components/ClaimPicker'
 import { MyTeamView } from './components/views/MyTeamView'
@@ -196,6 +197,7 @@ export function App() {
 
   return (
     <div className="app-shell">
+      <EmojiSwirl />
       <header className={styles.header}>
         <h1 className={styles.title}>
           <span className={styles.trophy} aria-hidden>

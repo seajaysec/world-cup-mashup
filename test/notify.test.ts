@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import type { FeedMatch, RosterEntry } from '../src/types'
-import { computeNotifyEvents } from '../src/lib/notify'
+import { computeNotifyEvents, summarizeSinceLastVisit } from '../src/lib/notify'
 
 const ALICE: RosterEntry = { member: 'Alice', team: 'Brazil', flag: '🇧🇷' }
 const BOB: RosterEntry = { member: 'Bob', team: 'France', flag: '🇫🇷' }
@@ -94,5 +94,58 @@ describe('computeNotifyEvents', () => {
     expect(results).toHaveLength(2)
     expect(results.find((e) => e.key.startsWith('1|'))!.title).toContain('✅') // Brazil won
     expect(results.find((e) => e.key.startsWith('2|'))!.title).toContain('❌') // France lost
+  })
+})
+
+/** Minimal in-memory localStorage so the stateful recap can be tested in node. */
+function installLocalStorage(): void {
+  const store = new Map<string, string>()
+  ;(globalThis as { localStorage?: Storage }).localStorage = {
+    getItem: (k: string) => store.get(k) ?? null,
+    setItem: (k: string, v: string) => void store.set(k, String(v)),
+    removeItem: (k: string) => void store.delete(k),
+    clear: () => store.clear(),
+    key: (i: number) => [...store.keys()][i] ?? null,
+    get length() {
+      return store.size
+    },
+  } as Storage
+}
+
+describe('summarizeSinceLastVisit', () => {
+  beforeEach(installLocalStorage)
+
+  it('shows nothing on the very first visit (no backlog dump)', () => {
+    const m = match({ score: { ft: [3, 1] } })
+    const res = summarizeSinceLastVisit([m], familyTeams, owners, NOW)
+    expect(res.firstVisit).toBe(true)
+    expect(res.items).toHaveLength(0)
+  })
+
+  it('reports a result that landed while away on a return visit', () => {
+    // First visit: nothing has happened yet.
+    summarizeSinceLastVisit([], familyTeams, owners, NOW)
+    // Return visit: a family game finished in the meantime.
+    const m = match({ score: { ft: [3, 1] } })
+    const res = summarizeSinceLastVisit([m], familyTeams, owners, NOW)
+    expect(res.firstVisit).toBe(false)
+    expect(res.items).toHaveLength(1)
+    expect(res.items[0].title).toContain('✅')
+  })
+
+  it('collapses a finished game to a single result line (not start + result)', () => {
+    summarizeSinceLastVisit([], familyTeams, owners, NOW)
+    const m = match({ score: { ft: [0, 2] } })
+    const res = summarizeSinceLastVisit([m], familyTeams, owners, NOW)
+    expect(res.items).toHaveLength(1)
+    expect(res.items[0].key).toContain('|result|')
+  })
+
+  it('does not repeat an item already shown on a prior visit', () => {
+    summarizeSinceLastVisit([], familyTeams, owners, NOW)
+    const m = match({ score: { ft: [3, 1] } })
+    expect(summarizeSinceLastVisit([m], familyTeams, owners, NOW).items).toHaveLength(1)
+    // Same data, next load — already consumed into the baseline.
+    expect(summarizeSinceLastVisit([m], familyTeams, owners, NOW).items).toHaveLength(0)
   })
 })

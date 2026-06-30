@@ -115,6 +115,12 @@ baseline means you only ever hear about changes from the moment you enabled it,
 never a backlog. (True web-push while the tab is closed isn't possible: a static
 site can't securely collect push subscriptions without a backend.)
 
+Because the tab can't alert you while it's closed, opening the page also shows a
+**"Since you were last here"** recap — every family game that kicked off or
+finished since this browser last saw the feed — built from the same baseline, so
+nothing is both pinged live and re-listed. Your first ever visit shows no recap
+(no backlog dump).
+
 ### Refreshing the "just for fun" country stats
 
 The My Team country-ranking card is baked from Our World in Data at build time

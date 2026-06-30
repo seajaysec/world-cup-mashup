@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { canonicalTeamName, TEAMS } from './data/teams'
 import { loadFeed, type LoadedFeed } from './lib/feed'
 import { derive, rosterByMember } from './lib/derive'
@@ -15,11 +15,13 @@ import {
   setRepick,
 } from './lib/format'
 import {
+  type AwayItem,
   disableNotifications,
   enableNotifications,
   notificationsSupported,
   notifyEnabled,
   primeBaseline,
+  summarizeSinceLastVisit,
   syncNotifications,
 } from './lib/notify'
 import { Tabs, type TabKey } from './components/Tabs'
@@ -57,6 +59,8 @@ export function App() {
     () => typeof window !== 'undefined' && window.location.hash === ABOUT_HASH,
   )
   const [alertsOn, setAlertsOn] = useState(() => notifyEnabled())
+  const [awayItems, setAwayItems] = useState<AwayItem[]>([])
+  const recapDone = useRef(false)
 
   useEffect(() => {
     const onHash = () => setShowAbout(window.location.hash === ABOUT_HASH)
@@ -139,6 +143,20 @@ export function App() {
     const opponent = isPlaceholder(oppRaw) ? formatSlot(oppRaw) : oppRaw
     return { team: claimedRoster!.team, opponent, when: formatKickoff(next), live: hours <= 0 }
   }, [derived, claimedMember, myTeam, now, claimedRoster])
+
+  // "While you were away": once per page load, summarize family-team games that
+  // kicked off or finished since this browser last saw the feed. Runs before the
+  // live-alert sync below so it claims the baseline first (no double-reporting).
+  useEffect(() => {
+    if (recapDone.current || !derived) return
+    recapDone.current = true
+    const { items } = summarizeSinceLastVisit(
+      derived.matches,
+      derived.familyTeams,
+      derived.ownerByTeam,
+    )
+    setAwayItems(items)
+  }, [derived])
 
   // Match alerts: while alerts are on, re-check the feed for any family team that
   // just kicked off or just finished. Results refresh with the feed (hourly / on
@@ -226,6 +244,32 @@ export function App() {
           <button type="button" className={styles.linkButton} onClick={toggleAlerts}>
             {alertsOn ? 'Turn off' : 'Turn on alerts'}
           </button>
+        </div>
+      )}
+
+      {!showAbout && awayItems.length > 0 && (
+        <div className={styles.awayCard}>
+          <div className={styles.awayHead}>
+            <span>👋 Since you were last here</span>
+            <button
+              type="button"
+              className={styles.linkButton}
+              onClick={() => setAwayItems([])}
+            >
+              Dismiss
+            </button>
+          </div>
+          <ul className={styles.awayList}>
+            {awayItems.slice(0, 10).map((item) => (
+              <li key={item.key} className={styles.awayItem}>
+                <span className={styles.awayItemTitle}>{item.title}</span>
+                <span className={styles.awayItemBody}>{item.body}</span>
+              </li>
+            ))}
+          </ul>
+          {awayItems.length > 10 && (
+            <p className={styles.awayMore}>…and {awayItems.length - 10} more.</p>
+          )}
         </div>
       )}
 

@@ -1,6 +1,6 @@
 import type { FeedMatch, RosterEntry } from '../types'
 import { getTeamMeta } from '../data/teams'
-import { parseKickoff, wasShootout, winnerSide } from './format'
+import { matchTimeKey, parseKickoff, wasShootout, winnerSide } from './format'
 
 /**
  * Client-side match alerts. While the page is open (it refreshes hourly and on
@@ -17,6 +17,9 @@ import { parseKickoff, wasShootout, winnerSide } from './format'
 
 const ENABLED_KEY = 'wc2026.notify.enabled'
 const SEEN_KEY = 'wc2026.notify.seen'
+// Set on the very first visit so the away-recap can tell "first time here"
+// (baseline silently, show nothing) from a genuine return visit (show the diff).
+const INIT_KEY = 'wc2026.notify.init'
 
 export function notificationsSupported(): boolean {
   return (
@@ -55,6 +58,22 @@ function getSeen(): Set<string> {
 function setSeen(seen: Set<string>): void {
   try {
     localStorage.setItem(SEEN_KEY, JSON.stringify([...seen]))
+  } catch {
+    /* no-op */
+  }
+}
+
+function visitedBefore(): boolean {
+  try {
+    return localStorage.getItem(INIT_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+function markVisited(): void {
+  try {
+    localStorage.setItem(INIT_KEY, '1')
   } catch {
     /* no-op */
   }
@@ -258,4 +277,60 @@ export async function syncNotifications(
   for (const e of fresh) {
     await show(e.title, e.body, e.key)
   }
+}
+
+export interface AwayItem {
+  key: string
+  title: string
+  body: string
+  /** Kickoff time, for ordering newest-first. */
+  t: number
+}
+
+/**
+ * "While you were away": every family-team game that kicked off or finished
+ * since the last time this browser saw it — i.e. events not already in the seen
+ * baseline (which a live notification would have consumed while the tab was
+ * open). Reuses the same baseline as the notifications so a game is never both
+ * notified live *and* re-listed here. Updating the baseline is a side effect, so
+ * call this once per page load.
+ *
+ * Returns `firstVisit: true` (and no items) the very first time, so a brand-new
+ * visitor isn't dumped the whole tournament so far.
+ */
+export function summarizeSinceLastVisit(
+  matches: FeedMatch[],
+  familyTeams: Set<string>,
+  ownerByTeam: Map<string, RosterEntry>,
+  nowMs: number = Date.now(),
+): { firstVisit: boolean; items: AwayItem[] } {
+  const seen = getSeen()
+  const current = computeNotifyEvents(matches, familyTeams, ownerByTeam, nowMs)
+  const fresh = new Set(current.filter((e) => !seen.has(e.key)).map((e) => e.key))
+  const byKey = new Map(current.map((e) => [e.key, e]))
+
+  // Advance the baseline to "everything known now" so these don't resurface.
+  for (const e of current) seen.add(e.key)
+  setSeen(seen)
+
+  const firstVisit = !visitedBefore()
+  markVisited()
+  if (firstVisit) return { firstVisit: true, items: [] }
+
+  // One line per family match-side: a finished result supersedes its kickoff.
+  const items: AwayItem[] = []
+  for (const m of matches) {
+    const t = matchTimeKey(m)
+    const id = matchKey(m)
+    for (const side of [1, 2] as const) {
+      const team = side === 1 ? m.team1 : m.team2
+      if (!familyTeams.has(team)) continue
+      const resultKey = `${side}|result|${id}`
+      const startKey = `${side}|start|${id}`
+      if (fresh.has(resultKey)) items.push({ ...byKey.get(resultKey)!, t })
+      else if (fresh.has(startKey)) items.push({ ...byKey.get(startKey)!, t })
+    }
+  }
+  items.sort((a, b) => b.t - a.t)
+  return { firstVisit: false, items }
 }

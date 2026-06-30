@@ -9,7 +9,12 @@ import {
   wasShootout,
 } from '../../lib/format'
 import { happyIcon, sadIcon } from '../../lib/icons'
-import { buildSlotResolver, computeGroupTables, type Slot } from '../../lib/bracket'
+import {
+  buildSlotResolver,
+  compareBracketMatches,
+  computeGroupTables,
+  type Slot,
+} from '../../lib/bracket'
 import { buildOwnerResolver } from '../../lib/ownership'
 import { ROSTER } from '../../data/roster'
 import { FavorMark, OwnerChip } from '../Badges'
@@ -218,7 +223,7 @@ export function BracketView({
       ROUNDS.map((r) => {
         const games = matches
           .filter((m) => m.round === r.key)
-          .sort((a, b) => (a.num ?? 0) - (b.num ?? 0))
+          .sort((a, b) => compareBracketMatches(a, b, now))
         const played = games.filter((m) => m.score?.ft).length
         // "Live" if any game is decided or has two concrete teams ready to play.
         const active = games.some((m) => {
@@ -229,7 +234,7 @@ export function BracketView({
         })
         return { ...r, games, played, active }
       }).filter((r) => r.games.length > 0),
-    [matches, resolveSlot],
+    [matches, resolveSlot, now],
   )
 
   const [open, setOpen] = useState<Record<string, boolean>>(() => {

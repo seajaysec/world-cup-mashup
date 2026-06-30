@@ -1,7 +1,7 @@
 import type { FeedMatch, GroupRecord } from '../types'
 import { canonicalTeamName } from '../data/teams'
 import { computeGroupRecords } from './standings'
-import { winnerSide } from './format'
+import { localDayKey, matchTimeKey, parseKickoff, winnerSide } from './format'
 
 /**
  * What occupies one side of a knockout tie, for display:
@@ -54,6 +54,37 @@ export function buildSlotResolver(matches: FeedMatch[]): (token: string) => Slot
   }
 
   return resolve
+}
+
+/**
+ * Where a match sits in the bracket's within-round ordering, relative to `now`:
+ * 0 = still to come (not played, today or later) — surfaced at the top.
+ * 1 = finished today — just below the upcoming games.
+ * 2 = an earlier day (done, or a stale awaiting-result) — sinks to the bottom.
+ * The local calendar day is used (not UTC) so it matches what the viewer sees.
+ */
+function bracketBucket(m: FeedMatch, today: string): 0 | 1 | 2 {
+  const played = Boolean(m.score?.ft)
+  const kickoff = parseKickoff(m.date, m.time)
+  const day = kickoff ? localDayKey(kickoff) : m.date
+  if (!played && day >= today) return 0
+  if (played && day === today) return 1
+  return 2
+}
+
+/**
+ * Order knockout games within a round: upcoming first (soonest kickoff on top),
+ * then today's results, then earlier days at the bottom (most recent first).
+ */
+export function compareBracketMatches(a: FeedMatch, b: FeedMatch, now: Date): number {
+  const today = localDayKey(now)
+  const ba = bracketBucket(a, today)
+  const bb = bracketBucket(b, today)
+  if (ba !== bb) return ba - bb
+  const ta = matchTimeKey(a)
+  const tb = matchTimeKey(b)
+  // Upcoming reads soonest-first; finished/past read most-recent-first.
+  return ba === 0 ? ta - tb : tb - ta
 }
 
 export interface GroupTableRow {

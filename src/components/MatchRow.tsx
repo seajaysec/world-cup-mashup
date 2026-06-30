@@ -1,7 +1,7 @@
 import type { FeedMatch, RosterEntry } from '../types'
 import { canonicalTeamName, getTeamMeta } from '../data/teams'
 import { formatKickoff, formatSlot, isPlaceholder } from '../lib/format'
-import { FavorMark, OwnerChip } from './Badges'
+import { FavorMark, OwnerChip, UnclaimedTag } from './Badges'
 import styles from '../styles/app.module.css'
 
 interface SideProps {
@@ -30,10 +30,10 @@ function MatchSide({ team, side, isWinner, owners }: SideProps) {
         <span className={styles.nm}>{name}</span>
         {side === 'right' && <span aria-hidden>{placeholder ? '·' : flagFor(team)}</span>}
       </div>
-      {(owner || !placeholder) && (
+      {!placeholder && (
         <div className={styles.matchSideMeta}>
-          {owner && <OwnerChip member={owner.member} flag={owner.flag} />}
-          {!placeholder && <FavorMark team={team} />}
+          {owner ? <OwnerChip member={owner.member} flag={owner.flag} /> : <UnclaimedTag />}
+          <FavorMark team={team} />
         </div>
       )}
     </div>

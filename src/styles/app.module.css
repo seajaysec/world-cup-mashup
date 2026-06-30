@@ -751,6 +751,29 @@
   font-size: 0.78rem;
   padding: 0 0.15em;
 }
+/* A candidate ("A or B") slot stacks its two possibilities, each with its owner. */
+.koCandidates {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+}
+.koCandidate {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35em;
+  font-style: normal;
+}
+.koCandidates .koOr {
+  padding: 0;
+}
+/* The counterpart to .ownerChip: a quiet marker for teams nobody picked. */
+.unclaimedTag {
+  font-size: 0.62rem;
+  font-style: italic;
+  color: var(--color-text-faint);
+  white-space: nowrap;
+}
 .koStatus {
   font-size: 0.66rem;
   text-transform: uppercase;

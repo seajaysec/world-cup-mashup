@@ -15,9 +15,9 @@ import {
   computeGroupTables,
   type Slot,
 } from '../../lib/bracket'
-import { buildOwnerResolver } from '../../lib/ownership'
+import { buildOwnerResolver, type OwnerResolver } from '../../lib/ownership'
 import { ROSTER } from '../../data/roster'
-import { FavorMark, OwnerChip } from '../Badges'
+import { FavorMark, OwnerChip, UnclaimedTag } from '../Badges'
 import styles from '../../styles/app.module.css'
 
 // Top → bottom: the trophy first, the first knockout round last (the group
@@ -52,14 +52,37 @@ const STATUS_TONE_CLASS: Record<StatusTone, string> = {
   wait: styles.statusWait,
 }
 
-/** One side of a tie: a real team, an "A or B" candidate, or TBD. */
+/** True if a slot names at least one team a family member owns (on `date`). */
+function slotHasOwner(slot: Slot, date: string, ownerOf: OwnerResolver): boolean {
+  if (slot.kind === 'team') return Boolean(ownerOf(slot.team, date))
+  if (slot.kind === 'candidates') return Boolean(ownerOf(slot.a, date) || ownerOf(slot.b, date))
+  return false
+}
+
+/** One candidate team inside an "A or B" slot: flag, name, and whose it'd be. */
+function Candidate({ team, owner }: { team: string; owner?: RosterEntry }) {
+  return (
+    <span className={styles.koCandidate}>
+      <span aria-hidden className={styles.koFlag}>
+        {getTeamMeta(team)?.flag ?? '·'}
+      </span>
+      {team}
+      {owner ? <OwnerChip member={owner.member} /> : <UnclaimedTag />}
+    </span>
+  )
+}
+
+/** One side of a tie: a real team, an "A or B" candidate, or TBD. We always say
+ * whose each named team is (owner chip) or mark it unclaimed — including both
+ * sides of a candidate slot — so no team is ever shown without attribution. */
 function KoSlot({
   slot,
   goals,
   isWinner,
   isLoser,
   mood,
-  owner,
+  ownerOf,
+  date,
   myTeam,
 }: {
   slot: Slot
@@ -67,8 +90,8 @@ function KoSlot({
   isWinner: boolean
   isLoser: boolean
   mood?: string
-  /** The family member who owned this team on the match date, if any. */
-  owner?: RosterEntry
+  ownerOf: OwnerResolver
+  date: string
   myTeam: string | null
 }) {
   if (slot.kind === 'tbd') {
@@ -83,24 +106,21 @@ function KoSlot({
   }
 
   if (slot.kind === 'candidates') {
-    const fa = getTeamMeta(slot.a)?.flag ?? '·'
-    const fb = getTeamMeta(slot.b)?.flag ?? '·'
+    const oa = ownerOf(slot.a, date)
+    const ob = ownerOf(slot.b, date)
+    const classes = [styles.koTeam, styles.koTbd, styles.koCandidates]
+    if (oa || ob) classes.push(styles.fam)
     return (
-      <div className={`${styles.koTeam} ${styles.koTbd}`}>
-        <span className={styles.koFlag} aria-hidden>
-          {fa}
-        </span>
-        <span className={styles.koName}>
-          {slot.a} <span className={styles.koOr}>or</span> {slot.b}
-        </span>
-        <span className={styles.koFlag} aria-hidden>
-          {fb}
-        </span>
+      <div className={classes.join(' ')}>
+        <Candidate team={slot.a} owner={oa} />
+        <span className={styles.koOr}>or</span>
+        <Candidate team={slot.b} owner={ob} />
       </div>
     )
   }
 
   const team = slot.team
+  const owner = ownerOf(team, date)
   const mine = myTeam === canonicalTeamName(team)
   const classes = [styles.koTeam]
   if (isWinner) classes.push(styles.koWin)
@@ -115,7 +135,7 @@ function KoSlot({
       </span>
       <span className={styles.koName}>{team}</span>
       <FavorMark team={team} />
-      {owner && <OwnerChip member={owner.member} />}
+      {owner ? <OwnerChip member={owner.member} /> : <UnclaimedTag />}
       {isWinner && <span className={styles.koResultWin}>WON</span>}
       {isLoser && <span className={styles.koResultOut}>OUT</span>}
       {mood && (
@@ -303,11 +323,10 @@ export function BracketView({
                   const seed = match.num ?? i
                   const s1 = resolveSlot(match.team1)
                   const s2 = resolveSlot(match.team2)
-                  // Who owned each team on the day this game was played (or now,
-                  // for upcoming games) — so a past game shows the right person.
-                  const owner1 = s1.kind === 'team' ? ownerOf(s1.team, match.date) : undefined
-                  const owner2 = s2.kind === 'team' ? ownerOf(s2.team, match.date) : undefined
-                  const fam = Boolean(owner1 || owner2)
+                  // Highlight the match if any named team in it (decided or a
+                  // candidate) belongs to a family member — owners are resolved
+                  // per-team inside KoSlot, date-aware so past games credit right.
+                  const fam = slotHasOwner(s1, match.date, ownerOf) || slotHasOwner(s2, match.date, ownerOf)
                   return (
                     <div
                       key={`${match.num ?? i}`}
@@ -327,7 +346,8 @@ export function BracketView({
                         isWinner={win === 1}
                         isLoser={win === 2}
                         mood={win === 1 ? happyIcon(seed) : win === 2 ? sadIcon(seed) : undefined}
-                        owner={owner1}
+                        ownerOf={ownerOf}
+                        date={match.date}
                         myTeam={myTeam}
                       />
                       <KoSlot
@@ -336,7 +356,8 @@ export function BracketView({
                         isWinner={win === 2}
                         isLoser={win === 1}
                         mood={win === 2 ? happyIcon(seed) : win === 1 ? sadIcon(seed) : undefined}
-                        owner={owner2}
+                        ownerOf={ownerOf}
+                        date={match.date}
                         myTeam={myTeam}
                       />
                       <div className={styles.koMatchMeta}>

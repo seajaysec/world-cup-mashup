@@ -73,3 +73,13 @@ export function OwnerChip({ member, flag }: { member: string; flag?: string }) {
     </span>
   )
 }
+
+/** Marks a team nobody in the family picked — the counterpart to OwnerChip, so
+ * every team mention is unambiguous (owned by someone, or explicitly unclaimed). */
+export function UnclaimedTag() {
+  return (
+    <span className={styles.unclaimedTag} title="No family member picked this team">
+      unclaimed
+    </span>
+  )
+}

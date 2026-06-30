@@ -1,11 +1,11 @@
-import { type CSSProperties, useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { SWIRL_EVENT, type SwirlDetail } from '../lib/swirl'
 import styles from '../styles/app.module.css'
 
 interface Particle {
   id: number
   emoji: string
-  /** End-of-flight offsets and spin, fed to the CSS keyframe as custom props. */
+  /** End-of-flight offsets and spin. */
   tx: number
   ty: number
   rot: number
@@ -49,28 +49,68 @@ function makeBurst(id: number, emoji: string): Burst {
   return { id, particles, ttlMs: maxEnd + 100 }
 }
 
+/**
+ * One flying emoji, animated via the Web Animations API. We deliberately avoid
+ * CSS `@keyframes` with `var(--x)` custom properties: iOS Safari drops those, so
+ * the swirl would silently do nothing there. element.animate() works everywhere.
+ */
+function ParticleSpan({ p }: { p: Particle }) {
+  const ref = useRef<HTMLSpanElement>(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el || typeof el.animate !== 'function') return
+    const reduce =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const rot = reduce ? 0 : p.rot
+    const anim = el.animate(
+      [
+        { transform: 'translate(-50%, -50%) translate(0, 0) rotate(0deg) scale(0.2)', opacity: 0 },
+        { opacity: 1, offset: 0.12 },
+        {
+          transform: `translate(-50%, -50%) translate(${p.tx}px, ${p.ty}px) rotate(${rot}deg) scale(1)`,
+          opacity: 0,
+        },
+      ],
+      {
+        duration: p.durMs,
+        delay: p.delayMs,
+        easing: 'cubic-bezier(0.2, 0.7, 0.3, 1)',
+        fill: 'both',
+      },
+    )
+    return () => anim.cancel()
+  }, [p])
+
+  return (
+    <span ref={ref} className={styles.swirlParticle} style={{ fontSize: `${p.size}rem` }}>
+      {p.emoji}
+    </span>
+  )
+}
+
 /** Page-wide overlay that renders emoji swirls on demand (see lib/swirl.ts). */
 export function EmojiSwirl() {
   const [bursts, setBursts] = useState<Burst[]>([])
 
   useEffect(() => {
     let nextId = 0
-    let timers: ReturnType<typeof setTimeout>[] = []
+    const timers: ReturnType<typeof setTimeout>[] = []
     const onSwirl = (e: Event) => {
       const emoji = (e as CustomEvent<SwirlDetail>).detail?.emoji
       if (!emoji) return
       const burst = makeBurst(nextId++, emoji)
       setBursts((b) => [...b, burst])
-      const t = setTimeout(() => {
-        setBursts((b) => b.filter((x) => x.id !== burst.id))
-      }, burst.ttlMs)
-      timers.push(t)
+      timers.push(
+        setTimeout(() => {
+          setBursts((b) => b.filter((x) => x.id !== burst.id))
+        }, burst.ttlMs),
+      )
     }
     window.addEventListener(SWIRL_EVENT, onSwirl)
     return () => {
       window.removeEventListener(SWIRL_EVENT, onSwirl)
       timers.forEach(clearTimeout)
-      timers = []
     }
   }, [])
 
@@ -79,24 +119,7 @@ export function EmojiSwirl() {
   return (
     <div className={styles.swirlOverlay} aria-hidden>
       {bursts.flatMap((burst) =>
-        burst.particles.map((p) => (
-          <span
-            key={`${burst.id}-${p.id}`}
-            className={styles.swirlParticle}
-            style={
-              {
-                '--tx': `${p.tx}px`,
-                '--ty': `${p.ty}px`,
-                '--rot': `${p.rot}deg`,
-                fontSize: `${p.size}rem`,
-                animationDelay: `${p.delayMs}ms`,
-                animationDuration: `${p.durMs}ms`,
-              } as CSSProperties
-            }
-          >
-            {p.emoji}
-          </span>
-        )),
+        burst.particles.map((p) => <ParticleSpan key={`${burst.id}-${p.id}`} p={p} />),
       )}
     </div>
   )

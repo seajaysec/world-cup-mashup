@@ -41,7 +41,13 @@ export const ROSTER: readonly RosterEntry[] = [
   { member: 'Marla', team: 'Cape Verde', flag: '🇨🇻' },
   { member: 'Ethan', team: 'Norway', flag: '🇳🇴' },
   { member: 'Dwight', team: 'Belgium', flag: '🇧🇪' },
-  { member: 'Kyle', team: 'Netherlands', flag: '🇳🇱' },
+  {
+    member: 'Kyle',
+    team: 'Canada',
+    flag: '🇨🇦',
+    since: '2026-06-30',
+    formerTeams: [{ team: 'Netherlands', until: '2026-06-30' }],
+  },
   { member: 'Eli', team: 'Colombia', flag: '🇨🇴' },
   { member: 'Jon', team: 'Uruguay', flag: '🇺🇾' },
 ]

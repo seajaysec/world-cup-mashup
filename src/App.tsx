@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { canonicalTeamName, TEAMS } from './data/teams'
 import { loadFeed, type LoadedFeed } from './lib/feed'
 import { derive, rosterByMember } from './lib/derive'
@@ -24,13 +24,14 @@ import styles from './styles/app.module.css'
 const ABOUT_HASH = '#how-it-works'
 
 function feedNote(loaded: LoadedFeed): string {
+  const when = loaded.fetchedAt ? new Date(loaded.fetchedAt).toLocaleString() : null
   switch (loaded.source) {
     case 'live':
-      return `Live data · updated ${new Date(loaded.fetchedAt ?? Date.now()).toLocaleTimeString()}`
     case 'cache':
-      return `Offline — showing cached data from ${new Date(loaded.fetchedAt ?? 0).toLocaleString()}`
+      // It's a snapshot your browser pulled at this time — not a live ticker.
+      return `Your copy — pulled from the feed ${when ?? 'recently'}.`
     case 'snapshot':
-      return 'Offline — showing the bundled snapshot, which may be out of date'
+      return 'Showing the bundled snapshot (couldn’t reach the live feed) — may be out of date.'
   }
 }
 
@@ -55,29 +56,34 @@ export function App() {
     setShowAbout(false)
   }
 
+  const [refreshing, setRefreshing] = useState(false)
+  const refreshFeed = useCallback(async (initial = false) => {
+    setRefreshing(true)
+    try {
+      const result = await loadFeed()
+      setLoaded(result)
+      setFailed(false)
+    } catch {
+      if (initial) setFailed(true)
+    } finally {
+      setRefreshing(false)
+    }
+  }, [])
+
   useEffect(() => {
-    let active = true
-    const refresh = (initial: boolean) =>
-      loadFeed()
-        .then((result) => active && setLoaded(result))
-        .catch(() => active && initial && setFailed(true))
-
-    refresh(true)
-
+    refreshFeed(true)
     // Keep an open tab current: re-fetch hourly, and whenever it regains focus
     // after being hidden a while (so a phone left open overnight catches up).
-    const hourly = setInterval(() => refresh(false), 60 * 60 * 1000)
+    const hourly = setInterval(() => refreshFeed(), 60 * 60 * 1000)
     const onVisible = () => {
-      if (document.visibilityState === 'visible') refresh(false)
+      if (document.visibilityState === 'visible') refreshFeed()
     }
     document.addEventListener('visibilitychange', onVisible)
-
     return () => {
-      active = false
       clearInterval(hourly)
       document.removeEventListener('visibilitychange', onVisible)
     }
-  }, [])
+  }, [refreshFeed])
 
   // Capture "now" once per load so the joke seasons, schedule, and bracket are
   // stable (and date-aware) for the render.
@@ -212,7 +218,19 @@ export function App() {
             <FeudsView feuds={derived.feuds} spoons={derived.spoons} claimedMember={claimedMember} />
           )}
 
-          {loaded && <p className={styles.feedNote}>{feedNote(loaded)}</p>}
+          {loaded && (
+            <p className={styles.feedNote}>
+              {feedNote(loaded)}{' '}
+              <button
+                type="button"
+                className={styles.refreshButton}
+                onClick={() => refreshFeed()}
+                disabled={refreshing}
+              >
+                {refreshing ? 'Refreshing…' : '↻ Refresh'}
+              </button>
+            </p>
+          )}
         </main>
         </FavorProvider>
       )}

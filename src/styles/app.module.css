@@ -528,6 +528,18 @@
   font-size: 0.72rem;
   margin-top: var(--space-5);
 }
+.refreshButton {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-info);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+.refreshButton:disabled {
+  color: var(--color-text-faint);
+}
 .primaryButton {
   background: var(--color-accent);
   color: var(--color-accent-ink);
@@ -845,6 +857,46 @@
 }
 .feudLosses {
   color: var(--color-out);
+}
+.feudSpoons {
+  color: var(--color-accent);
+}
+.feudHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+}
+.feudName {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+.feudSection {
+  margin-top: var(--space-3);
+}
+.feudSub {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-faint);
+  margin-bottom: 0.25rem;
+}
+.feudLines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+.feudLines strong {
+  color: var(--color-text);
+}
+.feudWhen {
+  color: var(--color-text-faint);
+  font-size: 0.78rem;
 }
 .spoonCount {
   font-weight: 700;

@@ -1,4 +1,4 @@
-import type { Feuds, SpoonTally } from '../../lib/feuds'
+import type { Defeat, Feuds, SpoonTally } from '../../lib/feuds'
 import styles from '../../styles/app.module.css'
 
 function shortDate(date: string): string {
@@ -6,6 +6,18 @@ function shortDate(date: string): string {
   return Number.isNaN(d.getTime())
     ? date
     : new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', timeZone: 'UTC' }).format(d)
+}
+
+interface Row {
+  member: string
+  kills: Defeat[]
+  defeats: Defeat[]
+  spoons: number
+  deadTeams: string[]
+}
+
+function whenLabel(d: Defeat): string {
+  return `${d.group ?? d.round} · ${shortDate(d.date)}`
 }
 
 export function FeudsView({
@@ -17,99 +29,119 @@ export function FeudsView({
   spoons: SpoonTally[]
   claimedMember: string | null
 }) {
-  const { feed, records } = feuds
-  const topWins = records[0]?.wins.length ?? 0
-  const uniqueLeader = topWins > 0 && records.filter((r) => r.wins.length === topWins).length === 1
+  // Merge kills, defeats and spoons into one row per member.
+  const rows = new Map<string, Row>()
+  const ensure = (member: string): Row => {
+    let r = rows.get(member)
+    if (!r) {
+      r = { member, kills: [], defeats: [], spoons: 0, deadTeams: [] }
+      rows.set(member, r)
+    }
+    return r
+  }
+  for (const rec of feuds.records) {
+    const r = ensure(rec.member)
+    r.kills = rec.wins
+    r.defeats = rec.losses
+  }
+  for (const s of spoons) {
+    const r = ensure(s.member)
+    r.spoons = s.count
+    r.deadTeams = s.deadTeams
+  }
+
+  const list = [...rows.values()].sort(
+    (a, b) =>
+      b.kills.length - a.kills.length ||
+      b.defeats.length - a.defeats.length ||
+      b.spoons - a.spoons ||
+      a.member.localeCompare(b.member),
+  )
+
+  const maxKills = Math.max(0, ...list.map((r) => r.kills.length))
+  const ruthlessUnique = maxKills > 0 && list.filter((r) => r.kills.length === maxKills).length === 1
+  const maxSpoons = Math.max(0, ...list.map((r) => r.spoons))
 
   return (
     <section>
-      <h2 className={styles.sectionTitle}>⚔️ Body count — family feuds</h2>
+      <h2 className={styles.sectionTitle}>⚔️ Body count</h2>
       <p className={styles.muted} style={{ marginTop: 0, fontSize: '0.85rem' }}>
-        When your team beats another family member&apos;s team, that&apos;s a kill. Each result is
-        credited to whoever owned the team <em>that day</em>, so re-picks are handled fairly. Draws
-        don&apos;t count.
+        Ranked by kills. A <strong>kill</strong> is beating another family member&apos;s team in a
+        real match — credited to whoever owned the team <em>that day</em>, so re-picks are fair
+        (draws don&apos;t count). 🥄 <strong>Wooden spoons</strong> are your knocked-out teams; the
+        most spoons is the biggest loser.
       </p>
 
-      {records.length === 0 ? (
-        <p className={styles.muted}>No family-vs-family clashes yet — but they&apos;re coming.</p>
+      {list.length === 0 ? (
+        <p className={styles.muted}>No clashes or spoons yet — it&apos;s early.</p>
       ) : (
-        <ul className={styles.matchList} style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-          {records.map((r) => {
-            const ruthless = uniqueLeader && r.wins.length === topWins
+        <div className={styles.matchList}>
+          {list.map((r) => {
+            const ruthless = ruthlessUnique && r.kills.length === maxKills
+            const spoonKing = maxSpoons > 0 && r.spoons === maxSpoons
             return (
-              <li
-                className={`${styles.tallyRow} ${r.member === claimedMember ? styles.mine : ''}`}
+              <div
                 key={r.member}
+                className={`${styles.card} ${r.member === claimedMember ? styles.mine : ''}`}
               >
-                <span className={styles.lbWho}>
-                  <div className={styles.lbMember}>
+                <div className={styles.feudHead}>
+                  <span className={styles.feudName}>
                     {ruthless && '🔪 '}
                     {r.member}
-                  </div>
-                  <div className={styles.lbStat}>
-                    {ruthless ? 'Most ruthless in the family' : 'Family head-to-head'}
-                  </div>
-                </span>
-                <span className={styles.feudTally}>
-                  <span className={styles.feudWins}>⚔️ {r.wins.length}</span>
-                  <span className={styles.feudLosses}>💀 {r.losses.length}</span>
-                </span>
-              </li>
-            )
-          })}
-        </ul>
-      )}
-
-      {feed.length > 0 && (
-        <>
-          <h2 className={styles.sectionTitle}>Kill feed</h2>
-          <ul className={styles.killFeed}>
-            {[...feed].reverse().map((d, i) => (
-              <li key={i} className={`${styles.killRow} ${d.winnerMember === claimedMember || d.loserMember === claimedMember ? styles.mine : ''}`}>
-                <div className={styles.killLine}>
-                  <strong>{d.winnerMember}</strong> <span aria-hidden>{d.winnerFlag}</span>{' '}
-                  {d.winnerTeam} <span className={styles.killBeat}>beat</span>{' '}
-                  <strong>{d.loserMember}</strong> <span aria-hidden>{d.loserFlag}</span>{' '}
-                  {d.loserTeam}{' '}
-                  <span className={styles.killScore}>
-                    {d.scoreWinner}–{d.scoreLoser}
+                  </span>
+                  <span className={styles.feudTally}>
+                    <span className={styles.feudWins}>⚔️ {r.kills.length}</span>
+                    <span className={styles.feudLosses}>💀 {r.defeats.length}</span>
+                    {r.spoons > 0 && <span className={styles.feudSpoons}>🥄 {r.spoons}</span>}
                   </span>
                 </div>
-                <div className={styles.killMeta}>
-                  {d.group ?? d.round} · {shortDate(d.date)}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
 
-      <h2 className={styles.sectionTitle}>🥄 Wooden-spoon race</h2>
-      <p className={styles.muted} style={{ marginTop: 0, fontSize: '0.85rem' }}>
-        Spoons rack up: every team you&apos;ve owned that got knocked out is one spoon. Most spoons
-        is the biggest loser — and <strong>wins that prize</strong>.
-      </p>
-      {spoons.length === 0 ? (
-        <p className={styles.muted}>No spoons yet — everyone&apos;s team is still alive.</p>
-      ) : (
-        <ul className={styles.matchList} style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-          {spoons.map((s) => (
-            <li
-              className={`${styles.tallyRow} ${s.member === claimedMember ? styles.mine : ''} ${s.isLeader ? styles.spoon : ''}`}
-              key={s.member}
-            >
-              <span className={styles.lbWho}>
-                <div className={styles.lbMember}>
-                  {s.isLeader && '🥄 '}
-                  {s.member}
-                  {s.isLeader && <span className={styles.muted}> — biggest loser (so far)</span>}
-                </div>
-                <div className={styles.lbStat}>Out: {s.deadTeams.join(', ')}</div>
-              </span>
-              <span className={styles.spoonCount}>🥄 × {s.count}</span>
-            </li>
-          ))}
-        </ul>
+                {r.kills.length > 0 && (
+                  <div className={styles.feudSection}>
+                    <div className={styles.feudSub}>Kills</div>
+                    <ul className={styles.feudLines}>
+                      {r.kills.map((d, i) => (
+                        <li key={i}>
+                          beat <strong>{d.loserMember}</strong> · {d.winnerFlag} {d.winnerTeam}{' '}
+                          {d.scoreWinner}–{d.scoreLoser} {d.loserTeam} {d.loserFlag}
+                          <span className={styles.feudWhen}> · {whenLabel(d)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {r.defeats.length > 0 && (
+                  <div className={styles.feudSection}>
+                    <div className={styles.feudSub}>Defeats</div>
+                    <ul className={styles.feudLines}>
+                      {r.defeats.map((d, i) => (
+                        <li key={i}>
+                          lost to <strong>{d.winnerMember}</strong> · {d.loserFlag} {d.loserTeam}{' '}
+                          {d.scoreLoser}–{d.scoreWinner} {d.winnerTeam} {d.winnerFlag}
+                          <span className={styles.feudWhen}> · {whenLabel(d)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {r.spoons > 0 && (
+                  <div className={styles.feudSection}>
+                    <div className={styles.feudSub}>
+                      🥄 Wooden spoons {spoonKing && <span className={styles.muted}>· biggest loser (so far)</span>}
+                    </div>
+                    <ul className={styles.feudLines}>
+                      {r.deadTeams.map((t, i) => (
+                        <li key={i}>{t} — knocked out</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
       )}
     </section>
   )

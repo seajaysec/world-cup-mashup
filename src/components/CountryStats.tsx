@@ -96,8 +96,9 @@ export function CountryStats({ team, heading }: { team: string; heading?: string
     <div className={styles.card}>
       <div className={styles.sectionTitle}>{heading ?? `Where ${team} ranks among World Cup teams`}</div>
       <p className={styles.muted} style={{ marginTop: 0, fontSize: '0.82rem' }}>
-        A separate competition: rank is among the 48 World Cup teams. Tap a row for the family
-        leaderboard.
+        A separate competition: rank is among the World Cup teams that have data for each metric — so
+        the field size (e.g. /48, /47, /40) varies, since the sources don&apos;t cover every nation.
+        Tap a row for the family leaderboard.
       </p>
 
       <ul className={styles.owidList}>

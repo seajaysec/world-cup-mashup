@@ -1,6 +1,7 @@
 import type { FeedMatch, GroupRecord } from '../types'
 import { canonicalTeamName } from '../data/teams'
 import { computeGroupRecords } from './standings'
+import { winnerSide } from './format'
 
 /**
  * What occupies one side of a knockout tie, for display:
@@ -38,11 +39,10 @@ export function buildSlotResolver(matches: FeedMatch[]): (token: string) => Slot
     const feeder = byNum.get(Number((win ?? lose)![1]))
     if (!feeder) return { kind: 'tbd' }
 
-    const ft = feeder.score?.ft
-    if (ft) {
-      const [a, b] = ft
-      const winner = a > b ? feeder.team1 : feeder.team2
-      const loser = a > b ? feeder.team2 : feeder.team1
+    const side = winnerSide(feeder) // respects penalty shootouts
+    if (side !== 0) {
+      const winner = side === 1 ? feeder.team1 : feeder.team2
+      const loser = side === 1 ? feeder.team2 : feeder.team1
       return { kind: 'team', team: canonicalTeamName(win ? winner : loser) }
     }
 

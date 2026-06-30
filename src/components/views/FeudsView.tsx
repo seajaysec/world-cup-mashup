@@ -1,4 +1,4 @@
-import type { Defeat, Feuds, SpoonTally } from '../../lib/feuds'
+import type { DeadTeam, Defeat, Feuds, SpoonTally } from '../../lib/feuds'
 import styles from '../../styles/app.module.css'
 
 function shortDate(date: string): string {
@@ -13,11 +13,40 @@ interface Row {
   kills: Defeat[]
   defeats: Defeat[]
   spoons: number
-  deadTeams: string[]
+  deadTeams: DeadTeam[]
 }
 
-function whenLabel(d: Defeat): string {
-  return `${d.group ?? d.round} · ${shortDate(d.date)}`
+function ScoreLine({
+  leftFlag,
+  leftTeam,
+  scoreLeft,
+  scoreRight,
+  rightTeam,
+  rightFlag,
+  pens,
+}: {
+  leftFlag: string
+  leftTeam: string
+  scoreLeft: number
+  scoreRight: number
+  rightTeam: string
+  rightFlag: string
+  pens: boolean
+}) {
+  return (
+    <span className={styles.scoreLine}>
+      {leftFlag} {leftTeam} <span className={styles.scoreChip}>{scoreLeft}–{scoreRight}</span>{' '}
+      {rightTeam} {rightFlag}
+      {pens && <span className={styles.pensTag}> (pens)</span>}
+    </span>
+  )
+}
+
+function deadLine(d: DeadTeam): string {
+  if (!d.exit) return `${d.team} — didn’t make it out of the group stage`
+  const e = d.exit
+  const pens = e.pens ? ' on pens' : ''
+  return `${d.team} — knocked out by ${e.opponentFlag} ${e.opponent} (${e.round}, ${e.scoreFor}–${e.scoreAgainst}${pens}) · ${shortDate(e.date)}`
 }
 
 export function FeudsView({
@@ -29,7 +58,6 @@ export function FeudsView({
   spoons: SpoonTally[]
   claimedMember: string | null
 }) {
-  // Merge kills, defeats and spoons into one row per member.
   const rows = new Map<string, Row>()
   const ensure = (member: string): Row => {
     let r = rows.get(member)
@@ -50,26 +78,29 @@ export function FeudsView({
     r.deadTeams = s.deadTeams
   }
 
+  // Sort by kills (desc); defeats and spoons drag you down (asc); then name.
   const list = [...rows.values()].sort(
     (a, b) =>
       b.kills.length - a.kills.length ||
-      b.defeats.length - a.defeats.length ||
-      b.spoons - a.spoons ||
+      a.defeats.length - b.defeats.length ||
+      a.spoons - b.spoons ||
       a.member.localeCompare(b.member),
   )
 
   const maxKills = Math.max(0, ...list.map((r) => r.kills.length))
   const ruthlessUnique = maxKills > 0 && list.filter((r) => r.kills.length === maxKills).length === 1
   const maxSpoons = Math.max(0, ...list.map((r) => r.spoons))
+  const loserUnique = maxSpoons > 0 && list.filter((r) => r.spoons === maxSpoons).length === 1
 
   return (
     <section>
       <h2 className={styles.sectionTitle}>⚔️ Body count</h2>
       <p className={styles.muted} style={{ marginTop: 0, fontSize: '0.85rem' }}>
-        Ranked by kills. A <strong>kill</strong> is beating another family member&apos;s team in a
-        real match — credited to whoever owned the team <em>that day</em>, so re-picks are fair
-        (draws don&apos;t count). 🥄 <strong>Wooden spoons</strong> are your knocked-out teams; the
-        most spoons is the biggest loser.
+        Ranked by kills (defeats and spoons drag you down). A <strong>kill</strong> is beating
+        another family member&apos;s team in a real match — credited to whoever owned the team{' '}
+        <em>that day</em>, so re-picks are fair (a penalty-shootout win counts; a true draw
+        doesn&apos;t). 🥄 <strong>Wooden spoons</strong> are your knocked-out teams; the most is the
+        biggest loser.
       </p>
 
       {list.length === 0 ? (
@@ -78,7 +109,7 @@ export function FeudsView({
         <div className={styles.matchList}>
           {list.map((r) => {
             const ruthless = ruthlessUnique && r.kills.length === maxKills
-            const spoonKing = maxSpoons > 0 && r.spoons === maxSpoons
+            const biggestLoser = loserUnique && r.spoons === maxSpoons
             return (
               <div
                 key={r.member}
@@ -102,9 +133,17 @@ export function FeudsView({
                     <ul className={styles.feudLines}>
                       {r.kills.map((d, i) => (
                         <li key={i}>
-                          beat <strong>{d.loserMember}</strong> · {d.winnerFlag} {d.winnerTeam}{' '}
-                          {d.scoreWinner}–{d.scoreLoser} {d.loserTeam} {d.loserFlag}
-                          <span className={styles.feudWhen}> · {whenLabel(d)}</span>
+                          beat <strong>{d.loserMember}</strong> ·{' '}
+                          <ScoreLine
+                            leftFlag={d.winnerFlag}
+                            leftTeam={d.winnerTeam}
+                            scoreLeft={d.scoreWinner}
+                            scoreRight={d.scoreLoser}
+                            rightTeam={d.loserTeam}
+                            rightFlag={d.loserFlag}
+                            pens={d.pens}
+                          />
+                          <span className={styles.feudWhen}> · {d.group ?? d.round} · {shortDate(d.date)}</span>
                         </li>
                       ))}
                     </ul>
@@ -117,9 +156,17 @@ export function FeudsView({
                     <ul className={styles.feudLines}>
                       {r.defeats.map((d, i) => (
                         <li key={i}>
-                          lost to <strong>{d.winnerMember}</strong> · {d.loserFlag} {d.loserTeam}{' '}
-                          {d.scoreLoser}–{d.scoreWinner} {d.winnerTeam} {d.winnerFlag}
-                          <span className={styles.feudWhen}> · {whenLabel(d)}</span>
+                          lost to <strong>{d.winnerMember}</strong> ·{' '}
+                          <ScoreLine
+                            leftFlag={d.loserFlag}
+                            leftTeam={d.loserTeam}
+                            scoreLeft={d.scoreLoser}
+                            scoreRight={d.scoreWinner}
+                            rightTeam={d.winnerTeam}
+                            rightFlag={d.winnerFlag}
+                            pens={d.pens}
+                          />
+                          <span className={styles.feudWhen}> · {d.group ?? d.round} · {shortDate(d.date)}</span>
                         </li>
                       ))}
                     </ul>
@@ -129,11 +176,12 @@ export function FeudsView({
                 {r.spoons > 0 && (
                   <div className={styles.feudSection}>
                     <div className={styles.feudSub}>
-                      🥄 Wooden spoons {spoonKing && <span className={styles.muted}>· biggest loser (so far)</span>}
+                      🥄 Wooden spoons{' '}
+                      {biggestLoser && <span className={styles.muted}>· biggest loser (so far)</span>}
                     </div>
                     <ul className={styles.feudLines}>
-                      {r.deadTeams.map((t, i) => (
-                        <li key={i}>{t} — knocked out</li>
+                      {r.deadTeams.map((d, i) => (
+                        <li key={i}>{deadLine(d)}</li>
                       ))}
                     </ul>
                   </div>

@@ -43,7 +43,16 @@ describe('computeSpoons (wooden spoons rack up)', () => {
   it('counts each knocked-out team a member has owned', () => {
     const aaron = spoons.find((s) => s.member === 'Aaron')
     expect(aaron?.count).toBe(1) // former Curaçao (current Switzerland is alive)
-    expect(aaron?.deadTeams).toContain('Curaçao')
+    expect(aaron?.deadTeams.map((d) => d.team)).toContain('Curaçao')
+  })
+
+  it('records how a knockout casualty went out, including penalties', () => {
+    // Elizabeth's former Germany lost the R32 to Paraguay on penalties (1-1, 3-4 pens).
+    const liz = spoons.find((s) => s.member === 'Elizabeth')
+    const germany = liz?.deadTeams.find((d) => d.team === 'Germany')
+    expect(germany?.exit?.opponent).toBe('Paraguay')
+    expect(germany?.exit?.pens).toBe(true)
+    expect(germany?.exit?.round).toBe('Round of 32')
   })
 
   it('marks the member(s) with the most spoons as the leader', () => {

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import type { FeedMatch, RosterEntry } from '../../types'
 import { canonicalTeamName, getTeamMeta } from '../../data/teams'
-import { formatKickoff, parseKickoff } from '../../lib/format'
+import { formatKickoff, parseKickoff, winnerSide, wasShootout } from '../../lib/format'
 import { happyIcon, sadIcon } from '../../lib/icons'
 import { buildSlotResolver, computeGroupTables, type Slot } from '../../lib/bracket'
 import { FavorMark, OwnerChip } from '../Badges'
@@ -18,11 +18,6 @@ const ROUNDS: { key: string; label: string; sub?: string }[] = [
   { key: 'Round of 32', label: 'Round of 32', sub: 'first knockout round' },
 ]
 
-function winnerSide(match: FeedMatch): 1 | 2 | 0 {
-  const ft = match.score?.ft
-  if (!ft) return 0
-  return ft[0] > ft[1] ? 1 : ft[1] > ft[0] ? 2 : 0
-}
 
 type StatusTone = 'done' | 'today' | 'soon' | 'wait'
 
@@ -330,6 +325,8 @@ export function BracketView({
                       <div className={styles.koMatchMeta}>
                         {formatKickoff(match)}
                         {match.ground ? ` · ${match.ground}` : ''}
+                        {wasShootout(match) &&
+                          ` · pens ${match.score!.p![0]}–${match.score!.p![1]}`}
                       </div>
                     </div>
                   )

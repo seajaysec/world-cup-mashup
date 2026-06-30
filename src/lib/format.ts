@@ -18,6 +18,27 @@ export function parseKickoff(date: string, time: string | undefined): Date | nul
   return Number.isNaN(d.getTime()) ? null : d
 }
 
+/**
+ * Which side won, accounting for a penalty shootout when full time was level.
+ * 1 = team1, 2 = team2, 0 = genuine draw (group stage). A knockout tie decided
+ * on penalties returns the shootout winner, not 0.
+ */
+export function winnerSide(match: FeedMatch): 0 | 1 | 2 {
+  const ft = match.score?.ft
+  if (!ft) return 0
+  if (ft[0] > ft[1]) return 1
+  if (ft[1] > ft[0]) return 2
+  const p = match.score?.p
+  if (p && p[0] !== p[1]) return p[0] > p[1] ? 1 : 2
+  return 0
+}
+
+/** True when a level full-time score was settled by a penalty shootout. */
+export function wasShootout(match: FeedMatch): boolean {
+  const ft = match.score?.ft
+  return Boolean(ft && ft[0] === ft[1] && match.score?.p)
+}
+
 /** Sort key for matches in chronological order (date, then time, then number). */
 export function matchTimeKey(match: FeedMatch): number {
   const kickoff = parseKickoff(match.date, match.time)

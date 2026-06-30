@@ -7,8 +7,16 @@ export interface FeedMatch {
   time: string
   team1: string
   team2: string
-  /** Absent until a match is played. `ft` = full time, `ht` = half time. */
-  score?: { ft?: [number, number]; ht?: [number, number] } | null
+  /**
+   * Absent until a match is played. `ft` = full time, `ht` = half time,
+   * `et` = after extra time, `p` = penalty shootout (knockout ties only).
+   */
+  score?: {
+    ft?: [number, number]
+    ht?: [number, number]
+    et?: [number, number]
+    p?: [number, number]
+  } | null
   group?: string
   ground?: string
   /** Only knockout matches carry a number (used by W##/L## placeholders). */
@@ -103,4 +111,15 @@ export interface TeamProgress {
   nextMatch?: FeedMatch
   /** Group-stage record (undefined for the for-fun picks). */
   groupRecord?: GroupRecord
+  /** How a knocked-out team went out (the match they lost). Absent for teams
+   * eliminated in the group stage, and for teams still alive. */
+  exit?: {
+    opponent: string
+    opponentFlag: string
+    scoreFor: number
+    scoreAgainst: number
+    pens: boolean
+    round: string
+    date: string
+  }
 }

@@ -898,6 +898,21 @@
   color: var(--color-text-faint);
   font-size: 0.78rem;
 }
+.scoreLine {
+  white-space: normal;
+}
+.scoreChip {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+  padding: 0.02rem 0.35rem;
+  white-space: nowrap;
+}
+.pensTag {
+  color: var(--color-accent);
+  font-size: 0.78rem;
+}
 .spoonCount {
   font-weight: 700;
   white-space: nowrap;

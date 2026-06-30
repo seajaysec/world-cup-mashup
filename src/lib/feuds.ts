@@ -1,6 +1,6 @@
 import type { FeedMatch, RosterEntry, TeamProgress } from '../types'
 import { canonicalTeamName, getTeamMeta } from '../data/teams'
-import { matchTimeKey } from './format'
+import { matchTimeKey, wasShootout, winnerSide } from './format'
 
 /** One family-member-beats-another result (a "kill"). */
 export interface Defeat {
@@ -15,6 +15,8 @@ export interface Defeat {
   loserFlag: string
   scoreWinner: number
   scoreLoser: number
+  /** True if the tie was settled on penalties. */
+  pens: boolean
 }
 
 export interface MemberRecord {
@@ -82,14 +84,15 @@ export function computeFeuds(roster: readonly RosterEntry[], matches: FeedMatch[
     .sort((a, b) => matchTimeKey(a) - matchTimeKey(b))
 
   for (const m of played) {
+    const side = winnerSide(m) // penalty shootouts count (the winner advanced)
+    if (side === 0) continue // a genuine draw isn't a kill
     const ft = m.score!.ft!
-    if (ft[0] === ft[1]) continue // draws aren't kills
     const when = dateMs(m.date)
     const owner1 = ownerAt(byTeam, m.team1, when)
     const owner2 = ownerAt(byTeam, m.team2, when)
     if (!owner1 || !owner2 || owner1 === owner2) continue
 
-    const team1Won = ft[0] > ft[1]
+    const team1Won = side === 1
     const winTeam = canonicalTeamName(team1Won ? m.team1 : m.team2)
     const loseTeam = canonicalTeamName(team1Won ? m.team2 : m.team1)
     feed.push({
@@ -104,6 +107,7 @@ export function computeFeuds(roster: readonly RosterEntry[], matches: FeedMatch[
       loserFlag: getTeamMeta(loseTeam)?.flag ?? '🏳️',
       scoreWinner: Math.max(ft[0], ft[1]),
       scoreLoser: Math.min(ft[0], ft[1]),
+      pens: wasShootout(m),
     })
   }
 
@@ -129,12 +133,18 @@ export function computeFeuds(roster: readonly RosterEntry[], matches: FeedMatch[
   }
 }
 
+/** One knocked-out team a member owned, with how it went out. */
+export interface DeadTeam {
+  team: string
+  exit?: TeamProgress['exit']
+}
+
 /** A member's running wooden-spoon tally. */
 export interface SpoonTally {
   member: string
   /** Number of this member's teams that have been knocked out (former + current-if-out). */
   count: number
-  deadTeams: string[]
+  deadTeams: DeadTeam[]
   /** True for the member(s) currently holding the most spoons. */
   isLeader: boolean
 }
@@ -148,11 +158,15 @@ export function computeSpoons(
   progressByTeam: Map<string, TeamProgress>,
 ): SpoonTally[] {
   const tallies: SpoonTally[] = []
+  const toDead = (team: string): DeadTeam => ({
+    team: canonicalTeamName(team),
+    exit: progressByTeam.get(canonicalTeamName(team))?.exit,
+  })
   for (const entry of roster) {
     if (entry.joke) continue
-    const dead = [...(entry.formerTeams ?? []).map((f) => f.team)]
+    const dead = [...(entry.formerTeams ?? []).map((f) => toDead(f.team))]
     const currentOut = progressByTeam.get(canonicalTeamName(entry.team))?.status === 'out'
-    if (currentOut) dead.push(entry.team)
+    if (currentOut) dead.push(toDead(entry.team))
     if (dead.length === 0) continue
     tallies.push({ member: entry.member, count: dead.length, deadTeams: dead, isLeader: false })
   }

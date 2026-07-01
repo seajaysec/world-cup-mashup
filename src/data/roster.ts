@@ -49,7 +49,13 @@ export const ROSTER: readonly RosterEntry[] = [
   },
   { member: 'Kim', team: 'Mexico', flag: '🇲🇽' },
   { member: 'Claire', team: 'Senegal', flag: '🇸🇳' },
-  { member: 'Nate', team: 'South Korea', flag: '🇰🇷' },
+  {
+    member: 'Nate',
+    team: 'Bosnia & Herzegovina',
+    flag: '🇧🇦',
+    since: '2026-07-01',
+    formerTeams: [{ team: 'South Korea', until: '2026-07-01' }],
+  },
   { member: 'Marla', team: 'Cape Verde', flag: '🇨🇻' },
   { member: 'Ethan', team: 'Norway', flag: '🇳🇴' },
   { member: 'Dwight', team: 'Belgium', flag: '🇧🇪' },
@@ -61,6 +67,12 @@ export const ROSTER: readonly RosterEntry[] = [
     formerTeams: [{ team: 'Netherlands', until: '2026-06-30' }],
   },
   { member: 'Eli', team: 'Colombia', flag: '🇨🇴' },
-  { member: 'Jon', team: 'Uruguay', flag: '🇺🇾' },
+  {
+    member: 'Jon',
+    team: 'Paraguay',
+    flag: '🇵🇾',
+    since: '2026-07-01',
+    formerTeams: [{ team: 'Uruguay', until: '2026-07-01' }],
+  },
   { member: 'FK', team: 'Austria', flag: '🇦🇹' },
 ]

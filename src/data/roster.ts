@@ -36,7 +36,7 @@ export const ROSTER: readonly RosterEntry[] = [
   { member: 'KarrLynn', team: 'Egypt', flag: '🇪🇬' },
   { member: 'Preston', team: 'Congo DR', flag: '🇨🇩' },
   { member: 'Kim', team: 'Mexico', flag: '🇲🇽' },
-  { member: 'Claire', team: 'New Zealand', flag: '🇳🇿' },
+  { member: 'Claire', team: 'Senegal', flag: '🇸🇳' },
   { member: 'Nate', team: 'South Korea', flag: '🇰🇷' },
   { member: 'Marla', team: 'Cape Verde', flag: '🇨🇻' },
   { member: 'Ethan', team: 'Norway', flag: '🇳🇴' },

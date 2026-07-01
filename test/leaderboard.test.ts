@@ -39,9 +39,11 @@ describe('buildLeaderboard', () => {
   })
 
   it('breaks ties between same-stage exits by group performance', () => {
-    // Among group-stage exits, New Zealand (1 pt) ranks below South Korea (3 pts).
-    const newZealand = board.findIndex((e) => e.roster.team === 'New Zealand')
-    const korea = board.findIndex((e) => e.roster.team === 'South Korea')
-    expect(korea).toBeLessThan(newZealand)
+    // Among teams that went out in the group stage, points rank them (desc),
+    // so the points down that block of the board never increase.
+    const groupOutPoints = board
+      .filter((e) => e.progress.stage === 'group')
+      .map((e) => e.progress.groupRecord?.points ?? 0)
+    expect(groupOutPoints).toEqual([...groupOutPoints].sort((a, b) => b - a))
   })
 })

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import type { FeedMatch, RosterEntry } from '../../types'
 import { canonicalTeamName, getTeamMeta } from '../../data/teams'
 import {
+  finalScore,
   formatKickoff,
   isSameLocalDay,
   parseKickoff,
@@ -318,7 +319,7 @@ export function BracketView({
             {isOpen && (
               <div className={styles.koList}>
                 {round.games.map((match, i) => {
-                  const ft = match.score?.ft
+                  const ft = finalScore(match)
                   const win = winnerSide(match)
                   const seed = match.num ?? i
                   const s1 = resolveSlot(match.team1)

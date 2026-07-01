@@ -1,6 +1,6 @@
 import type { FeedMatch, RosterEntry, TeamProgress } from '../types'
 import { canonicalTeamName, getTeamMeta } from '../data/teams'
-import { matchTimeKey, wasShootout, winnerSide } from './format'
+import { finalScore, matchTimeKey, wasShootout, winnerSide } from './format'
 import { buildOwnerResolver } from './ownership'
 
 /** One family-member-beats-another result (a "kill"). */
@@ -43,9 +43,9 @@ export function computeFeuds(roster: readonly RosterEntry[], matches: FeedMatch[
     .sort((a, b) => matchTimeKey(a) - matchTimeKey(b))
 
   for (const m of played) {
-    const side = winnerSide(m) // penalty shootouts count (the winner advanced)
+    const side = winnerSide(m) // extra time + penalty shootouts count
     if (side === 0) continue // a genuine draw isn't a kill
-    const ft = m.score!.ft!
+    const final = finalScore(m)!
     const owner1 = ownerOf(m.team1, m.date)?.member
     const owner2 = ownerOf(m.team2, m.date)?.member
     if (!owner1 || !owner2 || owner1 === owner2) continue
@@ -63,8 +63,8 @@ export function computeFeuds(roster: readonly RosterEntry[], matches: FeedMatch[
       loserMember: team1Won ? owner2 : owner1,
       loserTeam: loseTeam,
       loserFlag: getTeamMeta(loseTeam)?.flag ?? '🏳️',
-      scoreWinner: Math.max(ft[0], ft[1]),
-      scoreLoser: Math.min(ft[0], ft[1]),
+      scoreWinner: Math.max(final[0], final[1]),
+      scoreLoser: Math.min(final[0], final[1]),
       pens: wasShootout(m),
     })
   }

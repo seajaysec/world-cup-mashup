@@ -1,6 +1,6 @@
 import type { FeedMatch, RosterEntry } from '../types'
 import { canonicalTeamName, getTeamMeta } from '../data/teams'
-import { formatKickoff, formatSlot, isPlaceholder } from '../lib/format'
+import { finalScore, formatKickoff, formatSlot, isPlaceholder, wasShootout, winnerSide } from '../lib/format'
 import { FavorMark, OwnerChip, UnclaimedTag } from './Badges'
 import styles from '../styles/app.module.css'
 
@@ -50,11 +50,13 @@ export function MatchRow({
   owners: Map<string, RosterEntry>
   highlight?: boolean
 }) {
-  const ft = match.score?.ft
-  const played = Boolean(ft)
-  const [g1, g2] = ft ?? [undefined, undefined]
-  const team1Won = played && g1! > g2!
-  const team2Won = played && g2! > g1!
+  // The decisive score (after extra time if played), and who actually won —
+  // never a raw full-time read, so an extra-time or shootout win is shown right.
+  const final = finalScore(match)
+  const played = Boolean(final)
+  const [g1, g2] = final ?? [undefined, undefined]
+  const side = winnerSide(match)
+  const shootout = wasShootout(match)
 
   return (
     <div className={`${styles.matchRow} ${highlight ? styles.highlight : ''}`}>
@@ -63,15 +65,16 @@ export function MatchRow({
         <span>{formatKickoff(match)}</span>
       </div>
       <div className={styles.matchTeams}>
-        <MatchSide team={match.team1} side="left" isWinner={team1Won} owners={owners} />
+        <MatchSide team={match.team1} side="left" isWinner={side === 1} owners={owners} />
         {played ? (
           <span className={styles.matchScore}>
             {g1}&ndash;{g2}
+            {shootout && <span className={styles.pensTag}> ({match.score!.p![0]}&ndash;{match.score!.p![1]} pens)</span>}
           </span>
         ) : (
           <span className={`${styles.matchScore} ${styles.vs}`}>vs</span>
         )}
-        <MatchSide team={match.team2} side="right" isWinner={team2Won} owners={owners} />
+        <MatchSide team={match.team2} side="right" isWinner={side === 2} owners={owners} />
       </div>
       {match.ground && <div className={styles.matchVenue}>📍 {match.ground}</div>}
     </div>

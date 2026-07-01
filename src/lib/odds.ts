@@ -1,6 +1,6 @@
 import type { FeedMatch, TeamProgress, Tier } from '../types'
 import { canonicalTeamName, getTeamMeta, tierForOdds, TEAMS } from '../data/teams'
-import { matchTimeKey } from './format'
+import { finalScore, matchTimeKey } from './format'
 
 /**
  * Live favoredness model — no external API, all derived from the feed.
@@ -77,7 +77,7 @@ export function computeFavor(
     const Rb = rating.get(b)
     if (Ra == null || Rb == null) continue // placeholder/non-WC side
 
-    const [g1, g2] = m.score!.ft!
+    const [g1, g2] = finalScore(m)!
     const expectedA = 1 / (1 + 10 ** ((Rb - Ra) / 400))
     const scoreA = g1 > g2 ? 1 : g1 < g2 ? 0 : 0.5
     const k = (isKnockout(m.round) ? 45 : 30) * marginMultiplier(Math.abs(g1 - g2))

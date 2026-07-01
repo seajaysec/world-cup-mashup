@@ -1,7 +1,7 @@
 import type { FeedMatch, GroupRecord, StageKey, TeamProgress } from '../types'
 import { canonicalTeamName, getTeamMeta } from '../data/teams'
 import { computeGroupRecords } from './standings'
-import { matchTimeKey, winnerSide } from './format'
+import { finalScore, matchTimeKey, wasShootout, winnerSide } from './format'
 
 /** Knockout rounds in chronological order, used to find a team's last exit. */
 const KO_ROUND_ORDER = [
@@ -214,16 +214,16 @@ export function computeTeamProgress(
   let exit: TeamProgress['exit']
   const lastKo = koPlayed[koPlayed.length - 1]
   if (status === 'out' && lastKo && winnerOf(lastKo) !== team) {
-    const ft = lastKo.score!.ft!
+    const final = finalScore(lastKo) ?? [0, 0]
     const teamIsHome = canonicalTeamName(lastKo.team1) === team
     const opponentRaw = teamIsHome ? lastKo.team2 : lastKo.team1
     const opponent = canonicalTeamName(opponentRaw)
     exit = {
       opponent,
       opponentFlag: getTeamMeta(opponent)?.flag ?? '🏳️',
-      scoreFor: teamIsHome ? ft[0] : ft[1],
-      scoreAgainst: teamIsHome ? ft[1] : ft[0],
-      pens: ft[0] === ft[1] && Boolean(lastKo.score?.p),
+      scoreFor: teamIsHome ? final[0] : final[1],
+      scoreAgainst: teamIsHome ? final[1] : final[0],
+      pens: wasShootout(lastKo),
       round: lastKo.round,
       date: lastKo.date,
     }

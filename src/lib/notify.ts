@@ -1,6 +1,6 @@
 import type { FeedMatch, RosterEntry } from '../types'
 import { getTeamMeta } from '../data/teams'
-import { matchTimeKey, parseKickoff, wasShootout, winnerSide } from './format'
+import { finalScore, matchTimeKey, parseKickoff, wasShootout, winnerSide } from './format'
 
 /**
  * Client-side match alerts. While the page is open (it refreshes hourly and on
@@ -189,9 +189,9 @@ function eventsForMatch(
   }
 
   if (resulted) {
-    const ft = m.score!.ft as [number, number]
-    const a = side === 1 ? ft[0] : ft[1] // goals for
-    const b = side === 1 ? ft[1] : ft[0] // goals against
+    const final = finalScore(m) ?? [0, 0]
+    const a = side === 1 ? final[0] : final[1] // goals for
+    const b = side === 1 ? final[1] : final[0] // goals against
     const ws = winnerSide(m)
     const pens = wasShootout(m) ? ' (on penalties)' : ''
     let title: string

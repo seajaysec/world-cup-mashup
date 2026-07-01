@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import type { FeedMatch, TeamMeta } from '../../types'
+import type { FeedMatch } from '../../types'
 import type { LeaderboardEntry } from '../../lib/leaderboard'
 import type { JokeProgress } from '../../lib/joke'
 import { formatOdds, getTeamMeta, TIER_LABELS } from '../../data/teams'
@@ -11,101 +10,16 @@ import { ClaimPicker } from '../ClaimPicker'
 import { JokeCard } from '../JokeCard'
 import styles from '../../styles/app.module.css'
 
-/** When your team is out, pencil in a still-alive replacement (local only). You
- * can scout a candidate's country stats before committing. */
-function RepickPanel({
-  member,
-  deadTeam,
-  available,
-  repickTeam,
-  onRepick,
-  onClearRepick,
-}: {
-  member: string
-  deadTeam: string
-  available: TeamMeta[]
-  repickTeam: string | undefined
-  onRepick: (team: string) => void
-  onClearRepick: () => void
-}) {
-  const [preview, setPreview] = useState('')
-
-  if (repickTeam) {
-    const repickMeta = getTeamMeta(repickTeam)
-    return (
-      <>
-        <div className={`${styles.card} ${styles.repickCard}`}>
-          <div className={styles.sectionTitle}>Your replacement pick</div>
-          <div className={styles.nextOpponent}>
-            {repickMeta?.flag ?? '🆕'} {repickTeam}
-          </div>
-          <p className={styles.muted}>
-            Provisional — saved on this device only. 📩 Message Chris to make it official:
-          </p>
-          <p className={styles.repickMessage}>“Hey Chris, {member} is re-picking {repickTeam}.”</p>
-          <div className={styles.repickActions}>
-            <label>
-              <span className="visually-hidden">Change replacement</span>
-              <select
-                className={styles.select}
-                value={repickTeam}
-                onChange={(e) => e.target.value && onRepick(e.target.value)}
-              >
-                {available.map((t) => (
-                  <option key={t.name} value={t.name}>
-                    {t.flag} {t.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button type="button" className={styles.linkButton} onClick={onClearRepick}>
-              Clear
-            </button>
-          </div>
-        </div>
-        <CountryStats team={repickTeam} heading={`Where ${repickTeam} ranks in the world`} />
-      </>
-    )
-  }
-
+/** Your team's out and re-picks are closed — no replacement, just the send-off. */
+function OutCard({ team }: { team: string }) {
   return (
-    <>
-      <div className={`${styles.card} ${styles.repickCard}`}>
-        <div className={styles.sectionTitle}>Pick a replacement</div>
-        <p className={styles.muted}>
-          {deadTeam} is out. Scout a still-alive team nobody owns — check how they stack up below —
-          then lock it in and tell Chris.
-        </p>
-        <label>
-          <span className="visually-hidden">Scout a replacement team</span>
-          <select
-            className={styles.select}
-            value={preview}
-            onChange={(e) => setPreview(e.target.value)}
-          >
-            <option value="" disabled>
-              {available.length ? 'Scout a replacement…' : 'No teams available right now'}
-            </option>
-            {available.map((t) => (
-              <option key={t.name} value={t.name}>
-                {t.flag} {t.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        {preview && (
-          <button
-            type="button"
-            className={styles.primaryButton}
-            style={{ marginTop: 'var(--space-3)' }}
-            onClick={() => onRepick(preview)}
-          >
-            Make {preview} my pick
-          </button>
-        )}
-      </div>
-      {preview && <CountryStats team={preview} heading={`Scouting ${preview}`} />}
-    </>
+    <div className={`${styles.card} ${styles.repickCard}`}>
+      <div className={styles.sectionTitle}>Knocked out</div>
+      <p className={styles.muted} style={{ marginBottom: 0 }}>
+        {team} is out — and every team is taken, so there&apos;s no re-pick this time. If
+        you&apos;re out, you&apos;re out. Better luck next year! 🫡
+      </p>
+    </div>
   )
 }
 
@@ -159,10 +73,6 @@ export function MyTeamView({
   onClaim,
   claimedMember,
   joke,
-  available,
-  repickTeam,
-  onRepick,
-  onClearRepick,
   mySpoons,
 }: {
   entry: LeaderboardEntry | undefined
@@ -170,10 +80,6 @@ export function MyTeamView({
   onClaim: (member: string) => void
   claimedMember: string | null
   joke: JokeProgress | undefined
-  available: TeamMeta[]
-  repickTeam: string | undefined
-  onRepick: (team: string) => void
-  onClearRepick: () => void
   mySpoons: number
 }) {
   const favor = useFavor()
@@ -248,16 +154,7 @@ export function MyTeamView({
         <NextMatch match={progress.nextMatch} team={progress.team} />
       )}
 
-      {progress.status === 'out' && (
-        <RepickPanel
-          member={roster.member}
-          deadTeam={roster.team}
-          available={available}
-          repickTeam={repickTeam}
-          onRepick={onRepick}
-          onClearRepick={onClearRepick}
-        />
-      )}
+      {progress.status === 'out' && <OutCard team={roster.team} />}
 
       <GroupRecord entry={entry} />
 

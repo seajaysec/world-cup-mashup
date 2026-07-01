@@ -9,16 +9,15 @@ out, what's coming up, and who's winning (or losing) the family prizes.
   a "just for fun" card ranking your country **among the 48 World Cup teams** on a
   handful of [Our World in Data](https://ourworldindata.org) metrics, plus a
   SOCCER row with the team's live Elo and trend. Tap any metric to reveal the
-  family leaderboard for it. If your team is knocked out, you can scout a
-  still-alive replacement (with the same stats) before you commit.
+  family leaderboard for it. If your team is knocked out, that's it — every team
+  is taken, so there are no more re-picks (if you're out, you're out).
 - **Feuds** — the family body count: who has beaten whom in real matches
   (credited to whoever owned the team on the match day, so re-picks are fair),
   plus the wooden-spoon race (most teams knocked out wins the "biggest loser"
   prize — spoons rack up).
 - **Standings** rank everyone best → worst. The top is on track to **win it all**
   (👑); the bottom is the wooden spoon for **losing the whole thing** (🥄). Also
-  lists owners who need a new team, the teams still up for grabs, and any re-pick
-  history.
+  lists any re-pick history from earlier in the tournament.
 - **Bracket** — a portrait, collapsible knockout view (trophy at the top, the
   opening round at the bottom) showing scores, who advanced (with happy/sad
   icons), and who's booked into upcoming rounds.
@@ -62,11 +61,11 @@ Everything family-specific lives in two files:
 
 - `src/data/roster.ts` — who picked what. To change a pick, edit the `team`
   (use the feed's spelling, or add an alias in `teams.ts`). Mark non-World-Cup
-  picks with `joke: true`. When someone re-picks after a knockout, set their new
-  `team`/`flag` and move the old name into `formerTeams: [...]` — the app shows
-  that history and frees the seat. (Players can also pencil in a provisional
-  replacement on the My Team tab; that's stored only in their browser until you
-  make it official here.)
+  picks with `joke: true`. Ownership is date-aware: set `since` (the day a team
+  was picked up) to stop its earlier games being back-credited, and move a
+  dropped team into `formerTeams: [{ team, since?, until }]` (each former team is
+  also a wooden spoon). `since`/`until` bound a stint precisely — the app credits
+  results, feuds, and knockouts to whoever held the team on each match's date.
 - `src/data/teams.ts` — each team's flag, group, and **pre-tournament title odds**
   (`odds`, a percent). This is only the *prior*; the live favoredness is computed
   from it (see below). Tiers (`favorite` / `contender` / `darkhorse` / `longshot`)

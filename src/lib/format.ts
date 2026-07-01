@@ -19,24 +19,37 @@ export function parseKickoff(date: string, time: string | undefined): Date | nul
 }
 
 /**
- * Which side won, accounting for a penalty shootout when full time was level.
- * 1 = team1, 2 = team2, 0 = genuine draw (group stage). A knockout tie decided
- * on penalties returns the shootout winner, not 0.
+ * The decisive aggregate score of a match: after extra time if it was played
+ * (`et`), otherwise full time (`ft`). Undefined until the match is played.
+ *
+ * openfootball reports a knockout in layers — `ft` is the score at 90 minutes,
+ * `et` the score after extra time (cumulative, so it already includes the `ft`
+ * goals), and `p` the penalty shootout. A game won in extra time has a *drawn*
+ * `ft`, so anything deciding a result must read `et ?? ft`, never `ft` alone.
+ */
+export function finalScore(match: FeedMatch): [number, number] | undefined {
+  return match.score?.et ?? match.score?.ft ?? undefined
+}
+
+/**
+ * Which side won. 1 = team1, 2 = team2, 0 = genuine draw (group stage). Uses the
+ * post-extra-time score, and falls to the penalty shootout when that's level —
+ * so an extra-time or shootout knockout returns its real winner, not 0.
  */
 export function winnerSide(match: FeedMatch): 0 | 1 | 2 {
-  const ft = match.score?.ft
-  if (!ft) return 0
-  if (ft[0] > ft[1]) return 1
-  if (ft[1] > ft[0]) return 2
+  const final = finalScore(match)
+  if (!final) return 0
+  if (final[0] > final[1]) return 1
+  if (final[1] > final[0]) return 2
   const p = match.score?.p
   if (p && p[0] !== p[1]) return p[0] > p[1] ? 1 : 2
   return 0
 }
 
-/** True when a level full-time score was settled by a penalty shootout. */
+/** True when a level (post-extra-time) score was settled by a penalty shootout. */
 export function wasShootout(match: FeedMatch): boolean {
-  const ft = match.score?.ft
-  return Boolean(ft && ft[0] === ft[1] && match.score?.p)
+  const final = finalScore(match)
+  return Boolean(final && final[0] === final[1] && match.score?.p)
 }
 
 /**
@@ -131,44 +144,6 @@ export function setClaimedMember(member: string): void {
 export function clearClaimedMember(): void {
   try {
     localStorage.removeItem(CLAIM_KEY)
-  } catch {
-    /* no-op */
-  }
-}
-
-/**
- * Provisional re-picks: when a member's team is knocked out they can pencil in a
- * replacement locally (per browser) before Chris makes it official in the
- * roster. Stored separately from the official roster and the claim, so it never
- * conflicts with the canonical picks — it's just a personal note + a nudge to
- * message Chris.
- */
-const REPICK_KEY = 'wc2026.repicks'
-
-export function getRepicks(): Record<string, string> {
-  try {
-    const raw = localStorage.getItem(REPICK_KEY)
-    return raw ? (JSON.parse(raw) as Record<string, string>) : {}
-  } catch {
-    return {}
-  }
-}
-
-export function setRepick(member: string, team: string): void {
-  try {
-    const all = getRepicks()
-    all[member] = team
-    localStorage.setItem(REPICK_KEY, JSON.stringify(all))
-  } catch {
-    /* storage disabled — provisional pick simply won't persist */
-  }
-}
-
-export function clearRepick(member: string): void {
-  try {
-    const all = getRepicks()
-    delete all[member]
-    localStorage.setItem(REPICK_KEY, JSON.stringify(all))
   } catch {
     /* no-op */
   }

@@ -1,18 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { canonicalTeamName, TEAMS } from './data/teams'
+import { canonicalTeamName } from './data/teams'
 import { loadFeed, type LoadedFeed } from './lib/feed'
 import { derive, rosterByMember } from './lib/derive'
 import {
   clearClaimedMember,
-  clearRepick,
   formatKickoff,
   formatSlot,
   getClaimedMember,
-  getRepicks,
   isPlaceholder,
   parseKickoff,
   setClaimedMember as persistClaim,
-  setRepick,
 } from './lib/format'
 import {
   type AwayItem,
@@ -55,7 +52,6 @@ export function App() {
   const [failed, setFailed] = useState(false)
   const [tab, setTab] = useState<TabKey>('me')
   const [claimedMember, setClaim] = useState<string | null>(() => getClaimedMember())
-  const [repicks, setRepicks] = useState<Record<string, string>>(() => getRepicks())
   const [showAbout, setShowAbout] = useState(
     () => typeof window !== 'undefined' && window.location.hash === ABOUT_HASH,
   )
@@ -117,16 +113,6 @@ export function App() {
     clearClaimedMember()
     setClaim(null)
   }
-  function repick(team: string) {
-    if (!claimedMember) return
-    setRepick(claimedMember, team)
-    setRepicks(getRepicks())
-  }
-  function clearMyRepick() {
-    if (!claimedMember) return
-    clearRepick(claimedMember)
-    setRepicks(getRepicks())
-  }
 
   const claimedRoster = rosterByMember(claimedMember)
   const myTeam = claimedRoster && !claimedRoster.joke ? canonicalTeamName(claimedRoster.team) : null
@@ -184,16 +170,6 @@ export function App() {
     }
     setAlertsOn(ok)
   }
-
-  // Unpicked teams still alive — the valid replacement pool for re-picks.
-  const available = useMemo(() => {
-    if (!derived) return []
-    return TEAMS.filter((t) => {
-      if (derived.ownerByTeam.has(t.name)) return false
-      const status = derived.progressByTeam.get(t.name)?.status
-      return status === 'alive' || status === 'champion'
-    }).sort((a, b) => a.name.localeCompare(b.name))
-  }, [derived])
 
   return (
     <div className="app-shell">
@@ -305,10 +281,6 @@ export function App() {
               onClaim={claim}
               claimedMember={claimedMember}
               joke={claimedMember ? derived.jokeByMember.get(claimedMember) : undefined}
-              available={available}
-              repickTeam={claimedMember ? repicks[claimedMember] : undefined}
-              onRepick={repick}
-              onClearRepick={clearMyRepick}
               mySpoons={
                 derived.spoons.find((s) => s.member === claimedMember)?.count ?? 0
               }
@@ -319,8 +291,6 @@ export function App() {
               leaderboard={derived.leaderboard}
               claimedMember={claimedMember}
               jokeByMember={derived.jokeByMember}
-              progressByTeam={derived.progressByTeam}
-              ownerByTeam={derived.ownerByTeam}
             />
           )}
           {tab === 'bracket' && (

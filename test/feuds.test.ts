@@ -76,8 +76,16 @@ describe('computeSpoons (wooden spoons rack up)', () => {
     for (const s of spoons) expect(s.isLeader).toBe(s.count === max)
   })
 
-  it('excludes joke picks from the spoon race', () => {
-    expect(spoons.some((s) => s.member === 'Harlan' || s.member === 'Charlie')).toBe(false)
+  it('excludes the joke pick from the spoon race', () => {
+    expect(spoons.some((s) => s.member === 'Charlie')).toBe(false)
+  })
+
+  it('does not back-credit Ecuador’s pre-pickup win over Germany to Harlan', () => {
+    // Harlan took Ecuador on 2026-06-30; Ecuador beat Elizabeth’s Germany on
+    // 2026-06-25, before that, so it must not count as Harlan’s kill.
+    expect(feuds.feed.some((f) => f.winnerMember === 'Harlan')).toBe(false)
+    const harlan = feuds.records.find((r) => r.member === 'Harlan')
+    expect(harlan).toBeUndefined()
   })
 })
 

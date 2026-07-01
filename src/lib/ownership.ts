@@ -23,20 +23,26 @@ function dateMs(date: string): number {
  */
 export function buildOwnerResolver(roster: readonly RosterEntry[]): OwnerResolver {
   const byTeam = new Map<string, Span[]>()
+  const push = (entry: RosterEntry, teamName: string, from: number, until: number) => {
+    const team = canonicalTeamName(teamName)
+    const list = byTeam.get(team) ?? []
+    list.push({ entry, from, until })
+    byTeam.set(team, list)
+  }
   for (const entry of roster) {
     if (entry.joke) continue
-    const ordered = [
-      ...(entry.formerTeams ?? []).map((f) => ({ team: f.team, until: dateMs(f.until) })),
-      { team: entry.team, until: Number.POSITIVE_INFINITY },
-    ]
+    // Former teams chain from -∞ through each one's `until`.
     let from = Number.NEGATIVE_INFINITY
-    for (const span of ordered) {
-      const team = canonicalTeamName(span.team)
-      const list = byTeam.get(team) ?? []
-      list.push({ entry, from, until: span.until })
-      byTeam.set(team, list)
-      from = span.until
+    for (const f of entry.formerTeams ?? []) {
+      const until = dateMs(f.until)
+      push(entry, f.team, from, until)
+      from = until
     }
+    // The current team starts at `since` when given — so a fresh pick of a team
+    // that was already playing doesn't back-credit its earlier games — otherwise
+    // right after the last former team (or -∞ if there were none).
+    const currentFrom = entry.since ? Math.max(from, dateMs(entry.since)) : from
+    push(entry, entry.team, currentFrom, Number.POSITIVE_INFINITY)
   }
   return (team, date) => {
     const when = dateMs(date)

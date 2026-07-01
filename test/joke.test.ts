@@ -50,11 +50,13 @@ describe('derive ownership + joke wiring', () => {
   it('maps real teams to their owning member', () => {
     expect(d.ownerByTeam.get('France')?.member).toBe('Chris')
     expect(d.ownerByTeam.get('DR Congo')?.member).toBe('Preston') // via alias
+    expect(d.ownerByTeam.get('Ecuador')?.member).toBe('Harlan') // converted from a joke pick
     expect(d.ownerByTeam.has('Galaxy')).toBe(false) // joke teams aren't owners of a WC team
   })
 
   it('computes a joke season per owning member', () => {
-    expect(d.jokeByMember.get('Harlan')?.team).toBe('Galaxy')
+    // Charlie is the only remaining for-fun pick (Harlan took a real team).
     expect(d.jokeByMember.get('Charlie')?.team).toBe('Denver Nuggets')
+    expect(d.jokeByMember.has('Harlan')).toBe(false)
   })
 })

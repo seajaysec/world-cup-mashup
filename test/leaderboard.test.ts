@@ -30,10 +30,12 @@ describe('buildLeaderboard', () => {
     expect(stages).toEqual(sortedDesc)
   })
 
-  it('pins the for-fun picks to the very bottom', () => {
-    const tail = board.slice(-2).map((e) => e.roster.team).sort()
-    expect(tail).toEqual(['Denver Nuggets', 'Galaxy'])
-    expect(board.slice(-2).every((e) => e.progress.status === 'notCompeting')).toBe(true)
+  it('pins the for-fun pick to the very bottom', () => {
+    // Only Denver Nuggets remains a for-fun pick (Harlan converted to a real team).
+    const last = board[board.length - 1]
+    expect(last.roster.team).toBe('Denver Nuggets')
+    expect(last.progress.status).toBe('notCompeting')
+    expect(board.filter((e) => e.progress.status === 'notCompeting')).toHaveLength(1)
   })
 
   it('breaks ties between same-stage exits by group performance', () => {

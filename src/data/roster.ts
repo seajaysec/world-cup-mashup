@@ -29,7 +29,7 @@ export const ROSTER: readonly RosterEntry[] = [
     formerTeams: [{ team: 'Curaçao', until: '2026-06-29' }],
   },
   { member: 'Chris', team: 'France', flag: '🇫🇷' },
-  { member: 'Harlan', team: 'Galaxy', flag: '🌌', joke: true },
+  { member: 'Harlan', team: 'Ecuador', flag: '🇪🇨', since: '2026-06-30' },
   { member: 'April', team: 'Croatia', flag: '🇭🇷' },
   { member: 'Charlie', team: 'Denver Nuggets', flag: '🏀', joke: true },
   { member: 'Carol', team: 'Morocco', flag: '🇲🇦' },

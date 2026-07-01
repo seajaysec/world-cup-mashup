@@ -7,8 +7,16 @@ export interface FeedMatch {
   time: string
   team1: string
   team2: string
-  /** Absent until a match is played. `ft` = full time, `ht` = half time. */
-  score?: { ft?: [number, number]; ht?: [number, number] } | null
+  /**
+   * Absent until a match is played. `ft` = full time, `ht` = half time,
+   * `et` = after extra time, `p` = penalty shootout (knockout ties only).
+   */
+  score?: {
+    ft?: [number, number]
+    ht?: [number, number]
+    et?: [number, number]
+    p?: [number, number]
+  } | null
   group?: string
   ground?: string
   /** Only knockout matches carry a number (used by W##/L## placeholders). */
@@ -31,6 +39,20 @@ export interface RosterEntry {
   flag: string
   /** True for the for-fun picks that aren't actually in the World Cup. */
   joke?: boolean
+  /** ISO date (YYYY-MM-DD) the current `team` was picked up. Absent = since the
+   * tournament started. Used to credit match results to the right owner. */
+  since?: string
+  /**
+   * Teams this member previously held and gave up (after a knockout), oldest
+   * first. `until` is the date they switched away (= the next team's `since`).
+   * `since` is optional and only needed when they *also* picked this team late
+   * (so its earlier games aren't back-credited) — e.g. a team picked mid-run and
+   * then dropped again; absent means they held it from the tournament's start.
+   * When re-assigning someone, move their old team here with the switch date and
+   * set `team`/`flag`/`since` to the new pick. Each former team is also a tally
+   * mark in the wooden-spoon race.
+   */
+  formerTeams?: { team: string; since?: string; until: string }[]
 }
 
 /** Static metadata about a real World Cup team. */
@@ -39,6 +61,9 @@ export interface TeamMeta {
   name: string
   flag: string
   group: string
+  /** Curated pre-tournament title-win odds, in percent. Single source of truth. */
+  odds: number
+  /** Favoredness band, derived from `odds`. */
   tier: Tier
 }
 
@@ -89,4 +114,15 @@ export interface TeamProgress {
   nextMatch?: FeedMatch
   /** Group-stage record (undefined for the for-fun picks). */
   groupRecord?: GroupRecord
+  /** How a knocked-out team went out (the match they lost). Absent for teams
+   * eliminated in the group stage, and for teams still alive. */
+  exit?: {
+    opponent: string
+    opponentFlag: string
+    scoreFor: number
+    scoreAgainst: number
+    pens: boolean
+    round: string
+    date: string
+  }
 }

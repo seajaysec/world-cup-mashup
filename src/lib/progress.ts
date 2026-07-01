@@ -1,7 +1,7 @@
 import type { FeedMatch, GroupRecord, StageKey, TeamProgress } from '../types'
 import { canonicalTeamName, getTeamMeta } from '../data/teams'
 import { computeGroupRecords } from './standings'
-import { matchTimeKey } from './format'
+import { finalScore, matchTimeKey, wasShootout, winnerSide } from './format'
 
 /** Knockout rounds in chronological order, used to find a team's last exit. */
 const KO_ROUND_ORDER = [
@@ -36,23 +36,19 @@ function isPlayed(match: FeedMatch): boolean {
   return Boolean(match.score?.ft)
 }
 
-/** Canonical winner of a played match, or null for a draw / unplayed. */
+/** Canonical winner of a played match (penalty shootouts respected), or null. */
 function winnerOf(match: FeedMatch): string | null {
-  const ft = match.score?.ft
-  if (!ft) return null
-  const [a, b] = ft
-  if (a > b) return canonicalTeamName(match.team1)
-  if (b > a) return canonicalTeamName(match.team2)
+  const side = winnerSide(match)
+  if (side === 1) return canonicalTeamName(match.team1)
+  if (side === 2) return canonicalTeamName(match.team2)
   return null
 }
 
-/** Canonical loser of a played match, or null for a draw / unplayed. */
+/** Canonical loser of a played match (penalty shootouts respected), or null. */
 function loserOf(match: FeedMatch): string | null {
-  const ft = match.score?.ft
-  if (!ft) return null
-  const [a, b] = ft
-  if (a > b) return canonicalTeamName(match.team2)
-  if (b > a) return canonicalTeamName(match.team1)
+  const side = winnerSide(match)
+  if (side === 1) return canonicalTeamName(match.team2)
+  if (side === 2) return canonicalTeamName(match.team1)
   return null
 }
 
@@ -213,6 +209,26 @@ export function computeTeamProgress(
     .sort((a, b) => KO_ROUND_ORDER.indexOf(a.round as never) - KO_ROUND_ORDER.indexOf(b.round as never))
 
   const { stage, status, label } = classifyFinished(team, koPlayed)
+
+  // Capture how a knockout casualty went out (their last KO match, which they lost).
+  let exit: TeamProgress['exit']
+  const lastKo = koPlayed[koPlayed.length - 1]
+  if (status === 'out' && lastKo && winnerOf(lastKo) !== team) {
+    const final = finalScore(lastKo) ?? [0, 0]
+    const teamIsHome = canonicalTeamName(lastKo.team1) === team
+    const opponentRaw = teamIsHome ? lastKo.team2 : lastKo.team1
+    const opponent = canonicalTeamName(opponentRaw)
+    exit = {
+      opponent,
+      opponentFlag: getTeamMeta(opponent)?.flag ?? '🏳️',
+      scoreFor: teamIsHome ? final[0] : final[1],
+      scoreAgainst: teamIsHome ? final[1] : final[0],
+      pens: wasShootout(lastKo),
+      round: lastKo.round,
+      date: lastKo.date,
+    }
+  }
+
   return {
     team,
     status,
@@ -220,6 +236,7 @@ export function computeTeamProgress(
     standingLabel: label,
     eliminatedLabel: status === 'out' ? label : undefined,
     groupRecord,
+    exit,
   }
 }
 

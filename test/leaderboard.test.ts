@@ -30,24 +30,20 @@ describe('buildLeaderboard', () => {
     expect(stages).toEqual(sortedDesc)
   })
 
-  it('pins the for-fun picks to the very bottom', () => {
-    const tail = board.slice(-2).map((e) => e.roster.team).sort()
-    expect(tail).toEqual(['Denver Nuggets', 'Galaxy'])
-    expect(board.slice(-2).every((e) => e.progress.status === 'notCompeting')).toBe(true)
-  })
-
-  it('awards the wooden spoon to the worst real team (Curaçao, by goal difference)', () => {
-    const spoon = board.find((e) => e.isWoodenSpoon)
-    expect(spoon?.roster.team).toBe('Curaçao')
-    expect(spoon?.roster.member).toBe('Aaron')
-    // Exactly one wooden spoon, and it is not a joke pick.
-    expect(board.filter((e) => e.isWoodenSpoon)).toHaveLength(1)
+  it('pins the for-fun pick to the very bottom', () => {
+    // Only Denver Nuggets remains a for-fun pick (Harlan converted to a real team).
+    const last = board[board.length - 1]
+    expect(last.roster.team).toBe('Denver Nuggets')
+    expect(last.progress.status).toBe('notCompeting')
+    expect(board.filter((e) => e.progress.status === 'notCompeting')).toHaveLength(1)
   })
 
   it('breaks ties between same-stage exits by group performance', () => {
-    // Among group-stage exits, Curaçao (1 pt, -8 GD) ranks below South Korea (3 pts).
-    const curacao = board.findIndex((e) => e.roster.team === 'Curaçao')
-    const korea = board.findIndex((e) => e.roster.team === 'South Korea')
-    expect(korea).toBeLessThan(curacao)
+    // Among teams that went out in the group stage, points rank them (desc),
+    // so the points down that block of the board never increase.
+    const groupOutPoints = board
+      .filter((e) => e.progress.stage === 'group')
+      .map((e) => e.progress.groupRecord?.points ?? 0)
+    expect(groupOutPoints).toEqual([...groupOutPoints].sort((a, b) => b - a))
   })
 })

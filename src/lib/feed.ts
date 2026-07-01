@@ -53,9 +53,18 @@ function isValidFeed(value: unknown): value is Feed {
  * gracefully: live fetch → last cached copy → the snapshot bundled at build time.
  * The app always gets *some* data so it never shows a blank screen.
  */
+/** How long to wait on the live feed before falling back to cache/snapshot. */
+const FETCH_TIMEOUT_MS = 6000
+
+function fetchWithTimeout(url: string, init?: RequestInit): Promise<Response> {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
+  return fetch(url, { ...init, signal: controller.signal }).finally(() => clearTimeout(timer))
+}
+
 export async function loadFeed(): Promise<LoadedFeed> {
   try {
-    const res = await fetch(FEED_URL, { cache: 'no-store' })
+    const res = await fetchWithTimeout(FEED_URL, { cache: 'no-store' })
     if (!res.ok) throw new Error(`feed responded ${res.status}`)
     const json: unknown = await res.json()
     if (!isValidFeed(json)) throw new Error('feed JSON was not in the expected shape')

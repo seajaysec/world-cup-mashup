@@ -18,6 +18,58 @@ export function parseKickoff(date: string, time: string | undefined): Date | nul
   return Number.isNaN(d.getTime()) ? null : d
 }
 
+/**
+ * The decisive aggregate score of a match: after extra time if it was played
+ * (`et`), otherwise full time (`ft`). Undefined until the match is played.
+ *
+ * openfootball reports a knockout in layers — `ft` is the score at 90 minutes,
+ * `et` the score after extra time (cumulative, so it already includes the `ft`
+ * goals), and `p` the penalty shootout. A game won in extra time has a *drawn*
+ * `ft`, so anything deciding a result must read `et ?? ft`, never `ft` alone.
+ */
+export function finalScore(match: FeedMatch): [number, number] | undefined {
+  return match.score?.et ?? match.score?.ft ?? undefined
+}
+
+/**
+ * Which side won. 1 = team1, 2 = team2, 0 = genuine draw (group stage). Uses the
+ * post-extra-time score, and falls to the penalty shootout when that's level —
+ * so an extra-time or shootout knockout returns its real winner, not 0.
+ */
+export function winnerSide(match: FeedMatch): 0 | 1 | 2 {
+  const final = finalScore(match)
+  if (!final) return 0
+  if (final[0] > final[1]) return 1
+  if (final[1] > final[0]) return 2
+  const p = match.score?.p
+  if (p && p[0] !== p[1]) return p[0] > p[1] ? 1 : 2
+  return 0
+}
+
+/** True when a level (post-extra-time) score was settled by a penalty shootout. */
+export function wasShootout(match: FeedMatch): boolean {
+  const final = finalScore(match)
+  return Boolean(final && final[0] === final[1] && match.score?.p)
+}
+
+/**
+ * "YYYY-MM-DD" for an instant in the *viewer's* local timezone. Use this — not
+ * `toISOString().slice(0,10)`, which is the UTC day and can be off by one
+ * (e.g. a US-evening "now" is already tomorrow in UTC) — for any "is this
+ * today?" check, so the answer matches the date the viewer actually sees.
+ */
+export function localDayKey(d: Date): string {
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
+/** True if the kickoff falls on the same local calendar day as `now`. */
+export function isSameLocalDay(a: Date, b: Date): boolean {
+  return localDayKey(a) === localDayKey(b)
+}
+
 /** Sort key for matches in chronological order (date, then time, then number). */
 export function matchTimeKey(match: FeedMatch): number {
   const kickoff = parseKickoff(match.date, match.time)

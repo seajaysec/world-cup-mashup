@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import type { FeedMatch } from '../../types'
+import type { FeedMatch, RosterEntry } from '../../types'
 import { canonicalTeamName } from '../../data/teams'
 import { matchTimeKey } from '../../lib/format'
 import { MatchRow } from '../MatchRow'
@@ -13,14 +13,15 @@ function involves(match: FeedMatch, teams: Set<string>): boolean {
 
 export function ScheduleView({
   matches,
-  family,
+  owners,
   myTeam,
 }: {
   matches: FeedMatch[]
-  family: Set<string>
+  owners: Map<string, RosterEntry>
   myTeam: string | null
 }) {
   const [filter, setFilter] = useState<Filter>(myTeam ? 'mine' : 'family')
+  const family = useMemo(() => new Set(owners.keys()), [owners])
 
   const { upcoming, results } = useMemo(() => {
     const teams =
@@ -39,6 +40,8 @@ export function ScheduleView({
       .sort((a, b) => matchTimeKey(a) - matchTimeKey(b))
     return { upcoming: pending, results: played }
   }, [matches, family, myTeam, filter])
+
+  const mineSet = useMemo(() => (myTeam ? new Set([myTeam]) : null), [myTeam])
 
   return (
     <section>
@@ -77,8 +80,8 @@ export function ScheduleView({
             <MatchRow
               key={`${match.round}-${match.team1}-${match.team2}-${i}`}
               match={match}
-              family={family}
-              highlight={Boolean(myTeam) && involves(match, new Set([myTeam!]))}
+              owners={owners}
+              highlight={Boolean(mineSet) && involves(match, mineSet!)}
             />
           ))}
         </div>
@@ -93,8 +96,8 @@ export function ScheduleView({
             <MatchRow
               key={`${match.round}-${match.team1}-${match.team2}-${i}`}
               match={match}
-              family={family}
-              highlight={Boolean(myTeam) && involves(match, new Set([myTeam!]))}
+              owners={owners}
+              highlight={Boolean(mineSet) && involves(match, mineSet!)}
             />
           ))}
         </div>

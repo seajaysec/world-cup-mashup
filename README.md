@@ -4,14 +4,28 @@ A dead-simple, mobile-first tracker for the family's 2026 World Cup pick'em. Eac
 person picked a team; this shows how everyone's doing, who's still in it, who's
 out, what's coming up, and who's winning (or losing) the family prizes.
 
-- **Pick your name** to follow your team — it's remembered in your browser only
-  (localStorage), no accounts.
+- **My Team** — pick your name (remembered in your browser only, no accounts) to
+  follow your team: status, next match, favoredness, and your rank. It also shows
+  a "just for fun" card ranking your country **among the 48 World Cup teams** on a
+  handful of [Our World in Data](https://ourworldindata.org) metrics, plus a
+  SOCCER row with the team's live Elo and trend. Tap any metric to reveal the
+  family leaderboard for it. If your team is knocked out, that's it — every team
+  is taken, so there are no more re-picks (if you're out, you're out).
+- **Feuds** — the family body count: who has beaten whom in real matches
+  (credited to whoever owned the team on the match day, so re-picks are fair),
+  plus the wooden-spoon race (most teams knocked out wins the "biggest loser"
+  prize — spoons rack up).
 - **Standings** rank everyone best → worst. The top is on track to **win it all**
-  (👑); the bottom is the wooden spoon for **losing the whole thing** (🥄).
-- **Roster** shows who has which team, who's knocked out, and which teams nobody
-  picked.
+  (👑); the bottom is the wooden spoon for **losing the whole thing** (🥄). Also
+  lists any re-pick history from earlier in the tournament.
+- **Bracket** — a portrait, collapsible knockout view (trophy at the top, the
+  opening round at the bottom) showing scores, who advanced (with happy/sad
+  icons), and who's booked into upcoming rounds.
 - **Schedule** lists upcoming matches and results in your local time zone, with
   venues — filter to just your team or all family teams.
+
+Owner chips appear next to every family team across matches, the schedule, and
+the bracket, so you always know whose pick is whose.
 
 ## Data
 
@@ -47,11 +61,32 @@ Everything family-specific lives in two files:
 
 - `src/data/roster.ts` — who picked what. To change a pick, edit the `team`
   (use the feed's spelling, or add an alias in `teams.ts`). Mark non-World-Cup
-  picks with `joke: true`.
-- `src/data/teams.ts` — each team's flag, group, and favoredness `tier`
-  (`favorite` / `contender` / `darkhorse` / `longshot`). The tiers are a
-  subjective pre-tournament guess; tune them to taste. The `TEAM_ALIASES` map
-  there handles spelling differences (e.g. `Congo DR` → `DR Congo`).
+  picks with `joke: true`. Ownership is date-aware: set `since` (the day a team
+  was picked up) to stop its earlier games being back-credited, and move a
+  dropped team into `formerTeams: [{ team, since?, until }]` (each former team is
+  also a wooden spoon). `since`/`until` bound a stint precisely — the app credits
+  results, feuds, and knockouts to whoever held the team on each match's date.
+- `src/data/teams.ts` — each team's flag, group, and **pre-tournament title odds**
+  (`odds`, a percent). This is only the *prior*; the live favoredness is computed
+  from it (see below). Tiers (`favorite` / `contender` / `darkhorse` / `longshot`)
+  are derived from the odds via the bands in `tierForOdds`. The `TEAM_ALIASES` map
+  handles spelling differences (e.g. `Congo DR` → `DR Congo`).
+
+## How favoredness works (live odds)
+
+Favoredness isn't a static number — it's computed in `src/lib/odds.ts`:
+
+1. Each team starts at an Elo rating seeded from its pre-tournament `odds` prior.
+2. Every played match nudges both teams' ratings (World-Football-Elo style): the
+   swing scales with the result, how surprising it was given the **opponent's
+   current rating**, and the **goal margin**.
+3. Live **title-win odds** are a softmax over the current ratings of the teams
+   still alive (eliminated = 0%, a crowned champion = 100%), and the tier is
+   derived from those live odds.
+
+So a team's odds drift from their prior as they win/lose against weak or strong
+opposition, and they're shown wherever a team appears. (The openfootball feed has
+no save/possession data, so the inputs are results, goals, and opponent strength.)
 
 ## Develop
 
@@ -65,6 +100,43 @@ npm run preview    # preview the production build
 
 The ranking and elimination logic is covered by tests in `test/` that run
 against the bundled snapshot.
+
+### Match alerts (browser notifications)
+
+There's no push server — instead, the open page itself does the alerting. Tap
+**🔔 Turn on alerts** on My Team to grant the browser's notification permission,
+and while the tab is open (it refreshes hourly and whenever you return to it) the
+app watches the live feed for **every** family-owned team and fires a local
+notification when one of their games kicks off and again when it finishes (won /
+lost / knocked out). It's all client-side (`src/lib/notify.ts` + a tiny service
+worker at `public/notify-sw.js` so notifications work on mobile); a localStorage
+baseline means you only ever hear about changes from the moment you enabled it,
+never a backlog. (True web-push while the tab is closed isn't possible: a static
+site can't securely collect push subscriptions without a backend.)
+
+Because the tab can't alert you while it's closed, opening the page also shows a
+**"Since you were last here"** recap — every family game that kicked off or
+finished since this browser last saw the feed — built from the same baseline, so
+nothing is both pinged live and re-listed. Your first ever visit shows no recap
+(no backlog dump).
+
+### Refreshing the "just for fun" country stats
+
+The My Team country-ranking card is baked from Our World in Data at build time
+into `src/data/owid-stats.json` (one global rank per metric per World Cup
+country). To refresh it:
+
+```bash
+npm run fetch:owid
+```
+
+This pulls the latest values from the OWID grapher CSV endpoints. Sources are
+the V-Dem electoral-democracy index, World Bank GDP per capita, life expectancy,
+the World Happiness Report (Cantril ladder), the UN Gender Inequality Index,
+consumption-based CO₂ per capita, gross public-sector debt, military expenditure,
+and population — each linked from the card. (EIU's Democracy Index is
+non-redistributable, so V-Dem's open index is used instead. The OWID feed has no
+save/possession data, so the Soccer row is our own live Elo.)
 
 ## Deploy (GitHub Pages)
 

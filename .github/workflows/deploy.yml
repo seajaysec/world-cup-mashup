@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - claude/family-world-cup-tracker-zi0vlf
   workflow_dispatch:
 
 # Permissions needed for the GitHub Pages deployment.

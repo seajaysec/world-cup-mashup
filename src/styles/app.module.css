@@ -106,6 +106,17 @@
   border-color: currentColor;
   background: transparent;
 }
+.tierOdds {
+  opacity: 0.85;
+  font-weight: 700;
+}
+.favorMark {
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  flex: none;
+  white-space: nowrap;
+}
 .tierFavorite {
   color: var(--tier-favorite);
 }
@@ -203,7 +214,22 @@
 .lbIntro {
   color: var(--color-text-muted);
   font-size: 0.88rem;
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+.tierLegend {
+  color: var(--color-text-faint);
+  font-size: 0.78rem;
+  margin: 0 0 var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+.lbStat {
+  color: var(--color-text-faint);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  margin-top: 0.1rem;
 }
 .lbList {
   display: flex;
@@ -300,13 +326,29 @@
 }
 .matchSide {
   display: flex;
-  align-items: center;
-  gap: 0.4em;
+  flex-direction: column;
+  gap: 0.2rem;
   min-width: 0;
 }
 .matchSide.right {
-  justify-content: flex-end;
+  align-items: flex-end;
   text-align: right;
+}
+.matchSideMain {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  min-width: 0;
+  max-width: 100%;
+}
+.matchSideMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  flex-wrap: wrap;
+}
+.matchSide.right .matchSideMeta {
+  justify-content: flex-end;
 }
 .matchSide.win {
   font-weight: 700;
@@ -315,6 +357,23 @@
   color: var(--color-info);
 }
 .matchSide .nm {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- Ownership chip ------------------------------------------------------ */
+.ownerChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  border-radius: 999px;
+  padding: 0.05rem 0.45rem;
+  max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -409,7 +468,7 @@
 }
 .tab {
   flex: 1;
-  max-width: 120px;
+  max-width: 100px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -417,8 +476,8 @@
   background: none;
   border: none;
   color: var(--color-text-faint);
-  padding: var(--space-1);
-  font-size: 0.68rem;
+  padding: var(--space-1) 2px;
+  font-size: 0.62rem;
 }
 .tab .icon {
   font-size: 1.25rem;
@@ -432,6 +491,32 @@
 .muted {
   color: var(--color-text-muted);
 }
+.aboutLink {
+  white-space: nowrap;
+}
+.about {
+  line-height: 1.55;
+}
+.about p {
+  color: var(--color-text-muted);
+}
+.aboutTitle {
+  font-size: 1.5rem;
+  margin: var(--space-2) 0 var(--space-3);
+}
+.about h2 {
+  margin-top: var(--space-5);
+}
+.aboutList {
+  color: var(--color-text-muted);
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.aboutList strong {
+  color: var(--color-text);
+}
 .center {
   text-align: center;
   padding: var(--space-6) var(--space-4);
@@ -442,6 +527,90 @@
   color: var(--color-text-faint);
   font-size: 0.72rem;
   margin-top: var(--space-5);
+}
+.alertsBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-4);
+  margin-bottom: var(--space-4);
+}
+.alertsText {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+.todayBanner {
+  background: color-mix(in srgb, var(--color-info) 16%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-info) 45%, var(--color-border));
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+  font-size: 0.9rem;
+}
+
+.awayCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+}
+.awayHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+}
+.awayList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.awayItem {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-2);
+}
+.awayItem:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+.awayItemTitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.awayItemBody {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+.awayMore {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin: var(--space-2) 0 0;
+}
+.refreshButton {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-info);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+.refreshButton:disabled {
+  color: var(--color-text-faint);
 }
 .primaryButton {
   background: var(--color-accent);
@@ -461,8 +630,627 @@
   max-width: 100%;
 }
 
+/* ---- Bracket ------------------------------------------------------------- */
+.koRound {
+  margin-top: var(--space-3);
+}
+.koRoundHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  margin-bottom: var(--space-2);
+  text-align: left;
+}
+.koChevron {
+  color: var(--color-text-faint);
+  font-size: 0.9rem;
+  width: 1rem;
+  flex: none;
+}
+.koRoundLabel {
+  flex: 1;
+  font-size: 1.02rem;
+  font-weight: 600;
+}
+.koRoundCount {
+  font-size: 0.72rem;
+  color: var(--color-text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  flex: none;
+}
+.koRoundDates {
+  font-weight: 400;
+  font-size: 0.78rem;
+  color: var(--color-text-faint);
+}
+.koLose .koName {
+  color: var(--color-text-faint);
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--color-out) 60%, transparent);
+}
+.koList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.koMatch {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+}
+.koMatch.highlight {
+  border-color: color-mix(in srgb, var(--color-info) 45%, var(--color-border));
+}
+.koTeam {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.2rem 0;
+  color: var(--color-text-muted);
+}
+.koTeam + .koTeam {
+  border-top: 1px dashed var(--color-border);
+}
+.koWin {
+  color: var(--color-text);
+  font-weight: 700;
+}
+.koTeam.fam .koName {
+  color: var(--color-info);
+}
+.koMine {
+  background: color-mix(in srgb, var(--color-info) 10%, transparent);
+  border-radius: var(--radius-sm);
+}
+.koFlag {
+  font-size: 1.2rem;
+  flex: none;
+}
+.koName {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.koMood {
+  font-size: 1rem;
+  flex: none;
+}
+.koResultWin,
+.koResultOut {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 0.05rem 0.35rem;
+  border-radius: 999px;
+  flex: none;
+}
+.koResultWin {
+  color: var(--color-accent-ink);
+  background: var(--color-alive);
+}
+.koResultOut {
+  color: #fff;
+  background: var(--color-out);
+}
+.koTbd .koName {
+  color: var(--color-text-faint);
+  font-style: italic;
+}
+.koOr {
+  color: var(--color-text-faint);
+  font-style: normal;
+  font-size: 0.78rem;
+  padding: 0 0.15em;
+}
+/* A candidate ("A or B") slot stacks its two possibilities, each with its owner. */
+.koCandidates {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+}
+.koCandidate {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35em;
+  font-style: normal;
+}
+.koCandidates .koOr {
+  padding: 0;
+}
+/* The counterpart to .ownerChip: a quiet marker for teams nobody picked. */
+.unclaimedTag {
+  font-size: 0.62rem;
+  font-style: italic;
+  color: var(--color-text-faint);
+  white-space: nowrap;
+}
+.koStatus {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-faint);
+  margin-bottom: 0.2rem;
+  font-weight: 700;
+}
+.statusDone {
+  color: var(--color-alive);
+}
+.statusToday {
+  color: var(--color-out);
+}
+.statusSoon {
+  color: var(--color-info);
+}
+.statusWait {
+  color: var(--color-accent);
+}
+.koRoundSub {
+  font-weight: 400;
+  font-size: 0.74rem;
+  color: var(--color-text-faint);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ---- Group-stage tables in the bracket ---------------------------------- */
+.groupGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2);
+}
+.groupCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+}
+.groupName {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-faint);
+  margin-bottom: var(--space-1);
+}
+.groupRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.2rem 0;
+  color: var(--color-text-muted);
+}
+.groupRow + .groupRow {
+  border-top: 1px dashed var(--color-border);
+}
+.groupAdv {
+  color: var(--color-text);
+}
+.groupTeam {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.groupOwner {
+  color: var(--color-accent);
+  font-size: 0.8rem;
+}
+.groupPts {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 560px) {
+  .groupGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.koGoals {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  min-width: 1.2rem;
+  text-align: right;
+}
+.koMatchMeta {
+  margin-top: 0.3rem;
+  font-size: 0.72rem;
+  color: var(--color-text-faint);
+}
+.championBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface));
+}
+.championTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+/* ---- Joke teams ---------------------------------------------------------- */
+.jokeCard {
+  border-color: color-mix(in srgb, var(--tier-darkhorse) 45%, var(--color-border));
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--tier-darkhorse) 16%, var(--color-surface)),
+    var(--color-surface)
+  );
+}
+.statusSparkle {
+  color: var(--tier-darkhorse);
+  background: color-mix(in srgb, var(--tier-darkhorse) 16%, transparent);
+}
+.jokeBlurb {
+  font-style: italic;
+  color: var(--color-text);
+}
+.formRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+.formDots {
+  display: inline-flex;
+  gap: 0.3rem;
+}
+.formDot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #08101f;
+}
+.formWin {
+  background: var(--color-alive);
+}
+.formDraw {
+  background: var(--color-text-faint);
+}
+.formLoss {
+  background: var(--color-out);
+}
+.jokeResults {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.jokeResults li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.jokeScore {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Feuds & wooden-spoon race ------------------------------------------ */
+.tallyRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+.tallyRow.mine {
+  outline: 2px solid var(--color-info);
+}
+.feudTally {
+  display: flex;
+  gap: var(--space-3);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.feudWins {
+  color: var(--color-alive);
+}
+.feudLosses {
+  color: var(--color-out);
+}
+.feudDefeats {
+  color: var(--color-text-muted);
+}
+.feudSpoons {
+  color: var(--color-accent);
+}
+.feudHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+}
+.feudName {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+.feudSection {
+  margin-top: var(--space-3);
+}
+.feudSub {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-faint);
+  margin-bottom: 0.25rem;
+}
+.feudLines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+.feudLines strong {
+  color: var(--color-text);
+}
+.feudWhen {
+  color: var(--color-text-faint);
+  font-size: 0.78rem;
+}
+.scoreLine {
+  white-space: normal;
+}
+.scoreChip {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+  padding: 0.02rem 0.35rem;
+  white-space: nowrap;
+}
+.pensTag {
+  color: var(--color-accent);
+  font-size: 0.78rem;
+}
+.spoonCount {
+  font-weight: 700;
+  white-space: nowrap;
+}
+.killFeed {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.killRow {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+}
+.killLine {
+  line-height: 1.4;
+}
+.killBeat {
+  color: var(--color-out);
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  padding: 0 0.2em;
+}
+.killScore {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+  padding: 0.05rem 0.4rem;
+}
+.killMeta {
+  color: var(--color-text-faint);
+  font-size: 0.74rem;
+  margin-top: 0.2rem;
+}
+
+/* ---- Country stats (OWID, just for fun) --------------------------------- */
+.owidList {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.owidRow {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  width: 100%;
+  background: none;
+  border: none;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+}
+.owidList > li + li {
+  border-top: 1px solid var(--color-border);
+}
+.owidTitle {
+  font-weight: 600;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  min-width: 0;
+}
+.owidChevron {
+  color: var(--color-text-faint);
+  font-size: 0.8rem;
+  width: 0.9rem;
+  flex: none;
+}
+.famBoard {
+  list-style: none;
+  margin: var(--space-1) 0 var(--space-2);
+  padding: var(--space-2);
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.famRow {
+  display: grid;
+  grid-template-columns: 1.6rem 1.3rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.82rem;
+  padding: 0.15rem 0.25rem;
+  border-radius: var(--radius-sm);
+}
+.famMine {
+  background: color-mix(in srgb, var(--color-info) 18%, transparent);
+}
+.famRank {
+  text-align: center;
+  font-weight: 700;
+}
+.famWho {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text-muted);
+}
+.famWho strong {
+  color: var(--color-text);
+}
+.famValue {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+.famNote {
+  font-size: 0.74rem;
+  color: var(--color-text-faint);
+  margin: 0 0 var(--space-2);
+}
+.owidValue {
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+.owidTrend {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.owidDelta {
+  color: var(--color-text-faint);
+  font-size: 0.78rem;
+}
+.sparkline {
+  display: block;
+}
+.owidRank {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-align: right;
+  min-width: 3.4rem;
+}
+.owidTotal {
+  color: var(--color-text-faint);
+  font-weight: 400;
+  font-size: 0.78rem;
+}
+.owidRankNone {
+  color: var(--color-text-faint);
+  font-size: 0.78rem;
+  white-space: nowrap;
+  min-width: 3.4rem;
+  text-align: right;
+}
+.rankGood {
+  color: var(--color-alive);
+}
+.rankMid {
+  color: var(--color-text);
+}
+.rankBad {
+  color: var(--color-out);
+}
+.owidSource {
+  color: var(--color-text-faint);
+  font-size: 0.72rem;
+  margin: var(--space-3) 0 0;
+}
+
+/* ---- Re-pick ------------------------------------------------------------- */
+.repickCard {
+  border-color: color-mix(in srgb, var(--color-info) 40%, var(--color-border));
+}
+.repickMessage {
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  font-style: italic;
+}
+.repickActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  flex-wrap: wrap;
+}
+
 @media (min-width: 560px) {
   .statGrid {
     max-width: 420px;
   }
+}
+
+/* ---- Easter egg: emoji swirl (tap a for-fun pick's card) ----------------- */
+.swirlOverlay {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 9999;
+}
+.swirlParticle {
+  /* Motion is driven by the Web Animations API (see EmojiSwirl.tsx) — not CSS
+     keyframes — because iOS Safari drops var() inside @keyframes. */
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  line-height: 1;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+/* The joke hero card invites a tap. cursor:pointer also makes iOS Safari treat a
+   non-button element as tappable, so the click reliably fires. */
+.jokeTap {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }

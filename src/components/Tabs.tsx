@@ -1,12 +1,13 @@
 import styles from '../styles/app.module.css'
 
-export type TabKey = 'me' | 'leaderboard' | 'roster' | 'schedule'
+export type TabKey = 'me' | 'leaderboard' | 'bracket' | 'schedule' | 'feuds'
 
 const TABS: { key: TabKey; label: string; icon: string }[] = [
   { key: 'me', label: 'My Team', icon: '⭐' },
   { key: 'leaderboard', label: 'Standings', icon: '🏆' },
-  { key: 'roster', label: 'Roster', icon: '👪' },
+  { key: 'bracket', label: 'Bracket', icon: '🗺️' },
   { key: 'schedule', label: 'Schedule', icon: '📅' },
+  { key: 'feuds', label: 'Feuds', icon: '⚔️' },
 ]
 
 export function Tabs({ active, onChange }: { active: TabKey; onChange: (key: TabKey) => void }) {

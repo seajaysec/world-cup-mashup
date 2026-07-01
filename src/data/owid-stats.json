@@ -1,0 +1,2068 @@
+{
+  "generated": "2026-06-29T23:22:56.909Z",
+  "source": "Our World in Data",
+  "metrics": [
+    {
+      "key": "democracy",
+      "title": "Democracy",
+      "slug": "electoral-democracy-index",
+      "dir": "high",
+      "note": "V-Dem electoral democracy index (0–1). #1 = most democratic.",
+      "page": "https://ourworldindata.org/grapher/electoral-democracy-index"
+    },
+    {
+      "key": "gdp",
+      "title": "GDP per capita",
+      "slug": "gdp-per-capita-worldbank",
+      "dir": "high",
+      "note": "World Bank, PPP. #1 = richest per person.",
+      "page": "https://ourworldindata.org/grapher/gdp-per-capita-worldbank"
+    },
+    {
+      "key": "life",
+      "title": "Life expectancy",
+      "slug": "life-expectancy",
+      "dir": "high",
+      "note": "#1 = longest-lived.",
+      "page": "https://ourworldindata.org/grapher/life-expectancy"
+    },
+    {
+      "key": "happiness",
+      "title": "Happiness",
+      "slug": "happiness-cantril-ladder",
+      "dir": "high",
+      "note": "Cantril ladder (0–10). #1 = happiest.",
+      "page": "https://ourworldindata.org/grapher/happiness-cantril-ladder"
+    },
+    {
+      "key": "gender",
+      "title": "Gender equality",
+      "slug": "gender-inequality-index-from-the-human-development-report",
+      "dir": "low",
+      "note": "UN Gender Inequality Index (lower = more equal). #1 = most equal.",
+      "page": "https://ourworldindata.org/grapher/gender-inequality-index-from-the-human-development-report"
+    },
+    {
+      "key": "co2",
+      "title": "CO₂ per capita",
+      "slug": "consumption-co2-per-capita",
+      "dir": "low",
+      "note": "Consumption-based, tonnes/person (lower = greener). #1 = greenest.",
+      "page": "https://ourworldindata.org/grapher/consumption-co2-per-capita"
+    },
+    {
+      "key": "debt",
+      "title": "Public debt",
+      "slug": "gross-public-sector-debt-as-a-proportion-of-gdp",
+      "dir": "low",
+      "note": "Gross public-sector debt, % of GDP (lower = less indebted). #1 = least debt.",
+      "page": "https://ourworldindata.org/grapher/gross-public-sector-debt-as-a-proportion-of-gdp"
+    },
+    {
+      "key": "military",
+      "title": "Military spending",
+      "slug": "military-expenditure-share-gdp",
+      "dir": "high",
+      "note": "Share of GDP. #1 = spends the most.",
+      "page": "https://ourworldindata.org/grapher/military-expenditure-share-gdp"
+    },
+    {
+      "key": "population",
+      "title": "Population",
+      "slug": "population",
+      "dir": "high",
+      "note": "#1 = most populous.",
+      "page": "https://ourworldindata.org/grapher/population"
+    }
+  ],
+  "data": {
+    "democracy": {
+      "Argentina": {
+        "value": 0.69,
+        "display": "0.69",
+        "year": 2025
+      },
+      "France": {
+        "value": 0.865,
+        "display": "0.86",
+        "year": 2025
+      },
+      "Spain": {
+        "value": 0.822,
+        "display": "0.82",
+        "year": 2025
+      },
+      "Brazil": {
+        "value": 0.784,
+        "display": "0.78",
+        "year": 2025
+      },
+      "England": {
+        "value": 0.772,
+        "display": "0.77",
+        "year": 2025
+      },
+      "Germany": {
+        "value": 0.828,
+        "display": "0.83",
+        "year": 2025
+      },
+      "Portugal": {
+        "value": 0.822,
+        "display": "0.82",
+        "year": 2025
+      },
+      "Netherlands": {
+        "value": 0.832,
+        "display": "0.83",
+        "year": 2025
+      },
+      "Belgium": {
+        "value": 0.889,
+        "display": "0.89",
+        "year": 2025
+      },
+      "USA": {
+        "value": 0.735,
+        "display": "0.73",
+        "year": 2025
+      },
+      "Uruguay": {
+        "value": 0.862,
+        "display": "0.86",
+        "year": 2025
+      },
+      "Croatia": {
+        "value": 0.686,
+        "display": "0.69",
+        "year": 2025
+      },
+      "Morocco": {
+        "value": 0.259,
+        "display": "0.26",
+        "year": 2025
+      },
+      "Colombia": {
+        "value": 0.679,
+        "display": "0.68",
+        "year": 2025
+      },
+      "Japan": {
+        "value": 0.819,
+        "display": "0.82",
+        "year": 2025
+      },
+      "Senegal": {
+        "value": 0.633,
+        "display": "0.63",
+        "year": 2025
+      },
+      "Switzerland": {
+        "value": 0.882,
+        "display": "0.88",
+        "year": 2025
+      },
+      "Mexico": {
+        "value": 0.469,
+        "display": "0.47",
+        "year": 2025
+      },
+      "Norway": {
+        "value": 0.89,
+        "display": "0.89",
+        "year": 2025
+      },
+      "Sweden": {
+        "value": 0.889,
+        "display": "0.89",
+        "year": 2025
+      },
+      "South Korea": {
+        "value": 0.819,
+        "display": "0.82",
+        "year": 2025
+      },
+      "Ecuador": {
+        "value": 0.607,
+        "display": "0.61",
+        "year": 2025
+      },
+      "Canada": {
+        "value": 0.84,
+        "display": "0.84",
+        "year": 2025
+      },
+      "Ivory Coast": {
+        "value": 0.394,
+        "display": "0.39",
+        "year": 2025
+      },
+      "Austria": {
+        "value": 0.839,
+        "display": "0.84",
+        "year": 2025
+      },
+      "Turkey": {
+        "value": 0.293,
+        "display": "0.29",
+        "year": 2025
+      },
+      "Egypt": {
+        "value": 0.187,
+        "display": "0.19",
+        "year": 2025
+      },
+      "Australia": {
+        "value": 0.844,
+        "display": "0.84",
+        "year": 2025
+      },
+      "Paraguay": {
+        "value": 0.581,
+        "display": "0.58",
+        "year": 2025
+      },
+      "Iran": {
+        "value": 0.159,
+        "display": "0.16",
+        "year": 2025
+      },
+      "Ghana": {
+        "value": 0.711,
+        "display": "0.71",
+        "year": 2025
+      },
+      "Czech Republic": {
+        "value": 0.849,
+        "display": "0.85",
+        "year": 2025
+      },
+      "Algeria": {
+        "value": 0.265,
+        "display": "0.27",
+        "year": 2025
+      },
+      "Scotland": {
+        "value": 0.772,
+        "display": "0.77",
+        "year": 2025
+      },
+      "Bosnia & Herzegovina": {
+        "value": 0.498,
+        "display": "0.50",
+        "year": 2025
+      },
+      "Tunisia": {
+        "value": 0.395,
+        "display": "0.40",
+        "year": 2025
+      },
+      "DR Congo": {
+        "value": 0.306,
+        "display": "0.31",
+        "year": 2025
+      },
+      "Panama": {
+        "value": 0.728,
+        "display": "0.73",
+        "year": 2025
+      },
+      "Qatar": {
+        "value": 0.034,
+        "display": "0.03",
+        "year": 2025
+      },
+      "Saudi Arabia": {
+        "value": 0.016,
+        "display": "0.02",
+        "year": 2025
+      },
+      "South Africa": {
+        "value": 0.743,
+        "display": "0.74",
+        "year": 2025
+      },
+      "Uzbekistan": {
+        "value": 0.218,
+        "display": "0.22",
+        "year": 2025
+      },
+      "Iraq": {
+        "value": 0.369,
+        "display": "0.37",
+        "year": 2025
+      },
+      "Jordan": {
+        "value": 0.282,
+        "display": "0.28",
+        "year": 2025
+      },
+      "Cape Verde": {
+        "value": 0.745,
+        "display": "0.74",
+        "year": 2025
+      },
+      "New Zealand": {
+        "value": 0.849,
+        "display": "0.85",
+        "year": 2025
+      },
+      "Haiti": {
+        "value": 0.238,
+        "display": "0.24",
+        "year": 2025
+      }
+    },
+    "gdp": {
+      "Argentina": {
+        "value": 26771.965,
+        "display": "$26,772",
+        "year": 2024
+      },
+      "France": {
+        "value": 54799.348,
+        "display": "$54,799",
+        "year": 2024
+      },
+      "Spain": {
+        "value": 48460.293,
+        "display": "$48,460",
+        "year": 2024
+      },
+      "Brazil": {
+        "value": 19652.365,
+        "display": "$19,652",
+        "year": 2024
+      },
+      "England": {
+        "value": 52621.18,
+        "display": "$52,621",
+        "year": 2024
+      },
+      "Germany": {
+        "value": 62554.555,
+        "display": "$62,555",
+        "year": 2024
+      },
+      "Portugal": {
+        "value": 42197.203,
+        "display": "$42,197",
+        "year": 2024
+      },
+      "Netherlands": {
+        "value": 70498.88,
+        "display": "$70,499",
+        "year": 2024
+      },
+      "Belgium": {
+        "value": 63347.785,
+        "display": "$63,348",
+        "year": 2024
+      },
+      "USA": {
+        "value": 75489.266,
+        "display": "$75,489",
+        "year": 2024
+      },
+      "Uruguay": {
+        "value": 32038.773,
+        "display": "$32,039",
+        "year": 2024
+      },
+      "Croatia": {
+        "value": 42829.2,
+        "display": "$42,829",
+        "year": 2024
+      },
+      "Morocco": {
+        "value": 9162.747,
+        "display": "$9,163",
+        "year": 2024
+      },
+      "Colombia": {
+        "value": 18477.215,
+        "display": "$18,477",
+        "year": 2024
+      },
+      "Japan": {
+        "value": 46106.92,
+        "display": "$46,107",
+        "year": 2024
+      },
+      "Senegal": {
+        "value": 4460.924,
+        "display": "$4,461",
+        "year": 2024
+      },
+      "Switzerland": {
+        "value": 82286.18,
+        "display": "$82,286",
+        "year": 2024
+      },
+      "Mexico": {
+        "value": 22039.629,
+        "display": "$22,040",
+        "year": 2024
+      },
+      "Norway": {
+        "value": 91105.25,
+        "display": "$91,105",
+        "year": 2024
+      },
+      "Sweden": {
+        "value": 62978.938,
+        "display": "$62,979",
+        "year": 2024
+      },
+      "South Korea": {
+        "value": 55070.938,
+        "display": "$55,071",
+        "year": 2024
+      },
+      "Ecuador": {
+        "value": 13935.539,
+        "display": "$13,936",
+        "year": 2024
+      },
+      "Canada": {
+        "value": 56706.824,
+        "display": "$56,707",
+        "year": 2024
+      },
+      "Ivory Coast": {
+        "value": 6747.038,
+        "display": "$6,747",
+        "year": 2024
+      },
+      "Austria": {
+        "value": 63788.08,
+        "display": "$63,788",
+        "year": 2024
+      },
+      "Turkey": {
+        "value": 36154.492,
+        "display": "$36,154",
+        "year": 2024
+      },
+      "Egypt": {
+        "value": 16798.152,
+        "display": "$16,798",
+        "year": 2024
+      },
+      "Australia": {
+        "value": 60303.98,
+        "display": "$60,304",
+        "year": 2024
+      },
+      "Paraguay": {
+        "value": 16296.283,
+        "display": "$16,296",
+        "year": 2024
+      },
+      "Iran": {
+        "value": 17484.133,
+        "display": "$17,484",
+        "year": 2024
+      },
+      "Ghana": {
+        "value": 7055.625,
+        "display": "$7,056",
+        "year": 2024
+      },
+      "Czech Republic": {
+        "value": 47963.9,
+        "display": "$47,964",
+        "year": 2024
+      },
+      "Algeria": {
+        "value": 15501.92,
+        "display": "$15,502",
+        "year": 2024
+      },
+      "Scotland": {
+        "value": 52621.18,
+        "display": "$52,621",
+        "year": 2024
+      },
+      "Bosnia & Herzegovina": {
+        "value": 20527.693,
+        "display": "$20,528",
+        "year": 2024
+      },
+      "Tunisia": {
+        "value": 12774.916,
+        "display": "$12,775",
+        "year": 2024
+      },
+      "DR Congo": {
+        "value": 1602.075,
+        "display": "$1,602",
+        "year": 2024
+      },
+      "Panama": {
+        "value": 36394.918,
+        "display": "$36,395",
+        "year": 2024
+      },
+      "Qatar": {
+        "value": 110889.79,
+        "display": "$110,890",
+        "year": 2024
+      },
+      "Saudi Arabia": {
+        "value": 62792.773,
+        "display": "$62,793",
+        "year": 2024
+      },
+      "South Africa": {
+        "value": 13597.654,
+        "display": "$13,598",
+        "year": 2024
+      },
+      "Uzbekistan": {
+        "value": 10450.205,
+        "display": "$10,450",
+        "year": 2024
+      },
+      "Iraq": {
+        "value": 12725.043,
+        "display": "$12,725",
+        "year": 2024
+      },
+      "Jordan": {
+        "value": 9520.251,
+        "display": "$9,520",
+        "year": 2024
+      },
+      "Cape Verde": {
+        "value": 9848.953,
+        "display": "$9,849",
+        "year": 2024
+      },
+      "New Zealand": {
+        "value": 49316.4,
+        "display": "$49,316",
+        "year": 2024
+      },
+      "Haiti": {
+        "value": 2809.6453,
+        "display": "$2,810",
+        "year": 2024
+      },
+      "Curaçao": {
+        "value": 28762.059,
+        "display": "$28,762",
+        "year": 2024
+      }
+    },
+    "life": {
+      "Argentina": {
+        "value": 77.3947,
+        "display": "77.4 yrs",
+        "year": 2023
+      },
+      "France": {
+        "value": 83.3253,
+        "display": "83.3 yrs",
+        "year": 2023
+      },
+      "Spain": {
+        "value": 83.6703,
+        "display": "83.7 yrs",
+        "year": 2023
+      },
+      "Brazil": {
+        "value": 75.8482,
+        "display": "75.8 yrs",
+        "year": 2023
+      },
+      "England": {
+        "value": 81.3015,
+        "display": "81.3 yrs",
+        "year": 2023
+      },
+      "Germany": {
+        "value": 81.3777,
+        "display": "81.4 yrs",
+        "year": 2023
+      },
+      "Portugal": {
+        "value": 82.3599,
+        "display": "82.4 yrs",
+        "year": 2023
+      },
+      "Netherlands": {
+        "value": 82.1576,
+        "display": "82.2 yrs",
+        "year": 2023
+      },
+      "Belgium": {
+        "value": 82.115,
+        "display": "82.1 yrs",
+        "year": 2023
+      },
+      "USA": {
+        "value": 79.3043,
+        "display": "79.3 yrs",
+        "year": 2023
+      },
+      "Uruguay": {
+        "value": 78.1385,
+        "display": "78.1 yrs",
+        "year": 2023
+      },
+      "Croatia": {
+        "value": 78.5803,
+        "display": "78.6 yrs",
+        "year": 2023
+      },
+      "Morocco": {
+        "value": 75.3128,
+        "display": "75.3 yrs",
+        "year": 2023
+      },
+      "Colombia": {
+        "value": 77.7246,
+        "display": "77.7 yrs",
+        "year": 2023
+      },
+      "Japan": {
+        "value": 84.7123,
+        "display": "84.7 yrs",
+        "year": 2023
+      },
+      "Senegal": {
+        "value": 68.6829,
+        "display": "68.7 yrs",
+        "year": 2023
+      },
+      "Switzerland": {
+        "value": 83.9536,
+        "display": "84.0 yrs",
+        "year": 2023
+      },
+      "Mexico": {
+        "value": 75.069,
+        "display": "75.1 yrs",
+        "year": 2023
+      },
+      "Norway": {
+        "value": 83.3078,
+        "display": "83.3 yrs",
+        "year": 2023
+      },
+      "Sweden": {
+        "value": 83.2624,
+        "display": "83.3 yrs",
+        "year": 2023
+      },
+      "South Korea": {
+        "value": 84.3288,
+        "display": "84.3 yrs",
+        "year": 2023
+      },
+      "Ecuador": {
+        "value": 77.3924,
+        "display": "77.4 yrs",
+        "year": 2023
+      },
+      "Canada": {
+        "value": 82.6302,
+        "display": "82.6 yrs",
+        "year": 2023
+      },
+      "Ivory Coast": {
+        "value": 61.9438,
+        "display": "61.9 yrs",
+        "year": 2023
+      },
+      "Austria": {
+        "value": 81.9559,
+        "display": "82.0 yrs",
+        "year": 2023
+      },
+      "Turkey": {
+        "value": 77.1557,
+        "display": "77.2 yrs",
+        "year": 2023
+      },
+      "Egypt": {
+        "value": 71.6335,
+        "display": "71.6 yrs",
+        "year": 2023
+      },
+      "Australia": {
+        "value": 83.9228,
+        "display": "83.9 yrs",
+        "year": 2023
+      },
+      "Paraguay": {
+        "value": 73.8443,
+        "display": "73.8 yrs",
+        "year": 2023
+      },
+      "Iran": {
+        "value": 77.6545,
+        "display": "77.7 yrs",
+        "year": 2023
+      },
+      "Ghana": {
+        "value": 65.4979,
+        "display": "65.5 yrs",
+        "year": 2023
+      },
+      "Czech Republic": {
+        "value": 79.8341,
+        "display": "79.8 yrs",
+        "year": 2023
+      },
+      "Algeria": {
+        "value": 76.261,
+        "display": "76.3 yrs",
+        "year": 2023
+      },
+      "Scotland": {
+        "value": 81.3015,
+        "display": "81.3 yrs",
+        "year": 2023
+      },
+      "Bosnia & Herzegovina": {
+        "value": 77.8504,
+        "display": "77.9 yrs",
+        "year": 2023
+      },
+      "Tunisia": {
+        "value": 76.5077,
+        "display": "76.5 yrs",
+        "year": 2023
+      },
+      "DR Congo": {
+        "value": 61.895,
+        "display": "61.9 yrs",
+        "year": 2023
+      },
+      "Panama": {
+        "value": 79.5937,
+        "display": "79.6 yrs",
+        "year": 2023
+      },
+      "Qatar": {
+        "value": 82.368,
+        "display": "82.4 yrs",
+        "year": 2023
+      },
+      "Saudi Arabia": {
+        "value": 78.7321,
+        "display": "78.7 yrs",
+        "year": 2023
+      },
+      "South Africa": {
+        "value": 66.1387,
+        "display": "66.1 yrs",
+        "year": 2023
+      },
+      "Uzbekistan": {
+        "value": 72.3884,
+        "display": "72.4 yrs",
+        "year": 2023
+      },
+      "Iraq": {
+        "value": 72.3242,
+        "display": "72.3 yrs",
+        "year": 2023
+      },
+      "Jordan": {
+        "value": 77.8145,
+        "display": "77.8 yrs",
+        "year": 2023
+      },
+      "Cape Verde": {
+        "value": 76.0587,
+        "display": "76.1 yrs",
+        "year": 2023
+      },
+      "New Zealand": {
+        "value": 82.088,
+        "display": "82.1 yrs",
+        "year": 2023
+      },
+      "Haiti": {
+        "value": 64.9356,
+        "display": "64.9 yrs",
+        "year": 2023
+      },
+      "Curaçao": {
+        "value": 76.7996,
+        "display": "76.8 yrs",
+        "year": 2023
+      }
+    },
+    "happiness": {
+      "Argentina": {
+        "value": 6.43,
+        "display": "6.43",
+        "year": 2025
+      },
+      "France": {
+        "value": 6.586,
+        "display": "6.59",
+        "year": 2025
+      },
+      "Spain": {
+        "value": 6.54,
+        "display": "6.54",
+        "year": 2025
+      },
+      "Brazil": {
+        "value": 6.634,
+        "display": "6.63",
+        "year": 2025
+      },
+      "England": {
+        "value": 6.694,
+        "display": "6.69",
+        "year": 2025
+      },
+      "Germany": {
+        "value": 6.882,
+        "display": "6.88",
+        "year": 2025
+      },
+      "Portugal": {
+        "value": 6.029,
+        "display": "6.03",
+        "year": 2025
+      },
+      "Netherlands": {
+        "value": 7.223,
+        "display": "7.22",
+        "year": 2025
+      },
+      "Belgium": {
+        "value": 6.926,
+        "display": "6.93",
+        "year": 2025
+      },
+      "USA": {
+        "value": 6.816,
+        "display": "6.82",
+        "year": 2025
+      },
+      "Uruguay": {
+        "value": 6.635,
+        "display": "6.63",
+        "year": 2025
+      },
+      "Croatia": {
+        "value": 6.009,
+        "display": "6.01",
+        "year": 2025
+      },
+      "Morocco": {
+        "value": 4.646,
+        "display": "4.65",
+        "year": 2025
+      },
+      "Colombia": {
+        "value": 6.04,
+        "display": "6.04",
+        "year": 2025
+      },
+      "Japan": {
+        "value": 6.13,
+        "display": "6.13",
+        "year": 2025
+      },
+      "Senegal": {
+        "value": 4.787,
+        "display": "4.79",
+        "year": 2025
+      },
+      "Switzerland": {
+        "value": 7.018,
+        "display": "7.02",
+        "year": 2025
+      },
+      "Mexico": {
+        "value": 6.972,
+        "display": "6.97",
+        "year": 2025
+      },
+      "Norway": {
+        "value": 7.242,
+        "display": "7.24",
+        "year": 2025
+      },
+      "Sweden": {
+        "value": 7.255,
+        "display": "7.25",
+        "year": 2025
+      },
+      "South Korea": {
+        "value": 6.04,
+        "display": "6.04",
+        "year": 2025
+      },
+      "Ecuador": {
+        "value": 6.144,
+        "display": "6.14",
+        "year": 2025
+      },
+      "Canada": {
+        "value": 6.741,
+        "display": "6.74",
+        "year": 2025
+      },
+      "Ivory Coast": {
+        "value": 5.148,
+        "display": "5.15",
+        "year": 2025
+      },
+      "Austria": {
+        "value": 6.845,
+        "display": "6.84",
+        "year": 2025
+      },
+      "Turkey": {
+        "value": 5.3,
+        "display": "5.30",
+        "year": 2025
+      },
+      "Egypt": {
+        "value": 3.862,
+        "display": "3.86",
+        "year": 2025
+      },
+      "Australia": {
+        "value": 6.916,
+        "display": "6.92",
+        "year": 2025
+      },
+      "Paraguay": {
+        "value": 6.198,
+        "display": "6.20",
+        "year": 2025
+      },
+      "Iran": {
+        "value": 5.151,
+        "display": "5.15",
+        "year": 2025
+      },
+      "Ghana": {
+        "value": 4.554,
+        "display": "4.55",
+        "year": 2025
+      },
+      "Czech Republic": {
+        "value": 6.821,
+        "display": "6.82",
+        "year": 2025
+      },
+      "Algeria": {
+        "value": 5.714,
+        "display": "5.71",
+        "year": 2025
+      },
+      "Scotland": {
+        "value": 6.694,
+        "display": "6.69",
+        "year": 2025
+      },
+      "Bosnia & Herzegovina": {
+        "value": 6.381,
+        "display": "6.38",
+        "year": 2025
+      },
+      "Tunisia": {
+        "value": 4.798,
+        "display": "4.80",
+        "year": 2025
+      },
+      "DR Congo": {
+        "value": 3.761,
+        "display": "3.76",
+        "year": 2025
+      },
+      "Panama": {
+        "value": 6.547,
+        "display": "6.55",
+        "year": 2025
+      },
+      "Qatar": {
+        "value": 6.374,
+        "display": "6.37",
+        "year": 2018
+      },
+      "Saudi Arabia": {
+        "value": 6.817,
+        "display": "6.82",
+        "year": 2025
+      },
+      "South Africa": {
+        "value": 5.009,
+        "display": "5.01",
+        "year": 2025
+      },
+      "Uzbekistan": {
+        "value": 6.283,
+        "display": "6.28",
+        "year": 2025
+      },
+      "Iraq": {
+        "value": 5.212,
+        "display": "5.21",
+        "year": 2025
+      },
+      "Jordan": {
+        "value": 4.478,
+        "display": "4.48",
+        "year": 2025
+      },
+      "New Zealand": {
+        "value": 6.995,
+        "display": "7.00",
+        "year": 2025
+      },
+      "Haiti": {
+        "value": 3.615,
+        "display": "3.62",
+        "year": 2020
+      }
+    },
+    "gender": {
+      "Argentina": {
+        "value": 0.264,
+        "display": "0.264",
+        "year": 2023
+      },
+      "France": {
+        "value": 0.034,
+        "display": "0.034",
+        "year": 2023
+      },
+      "Spain": {
+        "value": 0.043,
+        "display": "0.043",
+        "year": 2023
+      },
+      "Brazil": {
+        "value": 0.39,
+        "display": "0.390",
+        "year": 2023
+      },
+      "England": {
+        "value": 0.083,
+        "display": "0.083",
+        "year": 2023
+      },
+      "Germany": {
+        "value": 0.057,
+        "display": "0.057",
+        "year": 2023
+      },
+      "Portugal": {
+        "value": 0.076,
+        "display": "0.076",
+        "year": 2023
+      },
+      "Netherlands": {
+        "value": 0.013,
+        "display": "0.013",
+        "year": 2023
+      },
+      "Belgium": {
+        "value": 0.031,
+        "display": "0.031",
+        "year": 2023
+      },
+      "USA": {
+        "value": 0.169,
+        "display": "0.169",
+        "year": 2023
+      },
+      "Uruguay": {
+        "value": 0.218,
+        "display": "0.218",
+        "year": 2023
+      },
+      "Croatia": {
+        "value": 0.074,
+        "display": "0.074",
+        "year": 2023
+      },
+      "Morocco": {
+        "value": 0.438,
+        "display": "0.438",
+        "year": 2023
+      },
+      "Colombia": {
+        "value": 0.393,
+        "display": "0.393",
+        "year": 2023
+      },
+      "Japan": {
+        "value": 0.059,
+        "display": "0.059",
+        "year": 2023
+      },
+      "Senegal": {
+        "value": 0.49,
+        "display": "0.490",
+        "year": 2023
+      },
+      "Switzerland": {
+        "value": 0.01,
+        "display": "0.010",
+        "year": 2023
+      },
+      "Mexico": {
+        "value": 0.358,
+        "display": "0.358",
+        "year": 2023
+      },
+      "Norway": {
+        "value": 0.004,
+        "display": "0.004",
+        "year": 2023
+      },
+      "Sweden": {
+        "value": 0.007,
+        "display": "0.007",
+        "year": 2023
+      },
+      "South Korea": {
+        "value": 0.038,
+        "display": "0.038",
+        "year": 2023
+      },
+      "Ecuador": {
+        "value": 0.358,
+        "display": "0.358",
+        "year": 2023
+      },
+      "Canada": {
+        "value": 0.052,
+        "display": "0.052",
+        "year": 2023
+      },
+      "Ivory Coast": {
+        "value": 0.589,
+        "display": "0.589",
+        "year": 2023
+      },
+      "Austria": {
+        "value": 0.033,
+        "display": "0.033",
+        "year": 2023
+      },
+      "Turkey": {
+        "value": 0.227,
+        "display": "0.227",
+        "year": 2023
+      },
+      "Egypt": {
+        "value": 0.398,
+        "display": "0.398",
+        "year": 2023
+      },
+      "Australia": {
+        "value": 0.056,
+        "display": "0.056",
+        "year": 2023
+      },
+      "Paraguay": {
+        "value": 0.412,
+        "display": "0.412",
+        "year": 2023
+      },
+      "Iran": {
+        "value": 0.482,
+        "display": "0.482",
+        "year": 2023
+      },
+      "Ghana": {
+        "value": 0.514,
+        "display": "0.514",
+        "year": 2023
+      },
+      "Czech Republic": {
+        "value": 0.088,
+        "display": "0.088",
+        "year": 2023
+      },
+      "Algeria": {
+        "value": 0.443,
+        "display": "0.443",
+        "year": 2023
+      },
+      "Scotland": {
+        "value": 0.083,
+        "display": "0.083",
+        "year": 2023
+      },
+      "Bosnia & Herzegovina": {
+        "value": 0.157,
+        "display": "0.157",
+        "year": 2023
+      },
+      "Tunisia": {
+        "value": 0.238,
+        "display": "0.238",
+        "year": 2023
+      },
+      "DR Congo": {
+        "value": 0.604,
+        "display": "0.604",
+        "year": 2023
+      },
+      "Panama": {
+        "value": 0.374,
+        "display": "0.374",
+        "year": 2023
+      },
+      "Qatar": {
+        "value": 0.195,
+        "display": "0.195",
+        "year": 2023
+      },
+      "Saudi Arabia": {
+        "value": 0.228,
+        "display": "0.228",
+        "year": 2023
+      },
+      "South Africa": {
+        "value": 0.388,
+        "display": "0.388",
+        "year": 2023
+      },
+      "Uzbekistan": {
+        "value": 0.291,
+        "display": "0.291",
+        "year": 2023
+      },
+      "Iraq": {
+        "value": 0.558,
+        "display": "0.558",
+        "year": 2023
+      },
+      "Jordan": {
+        "value": 0.433,
+        "display": "0.433",
+        "year": 2023
+      },
+      "Cape Verde": {
+        "value": 0.298,
+        "display": "0.298",
+        "year": 2023
+      },
+      "New Zealand": {
+        "value": 0.082,
+        "display": "0.082",
+        "year": 2023
+      },
+      "Haiti": {
+        "value": 0.618,
+        "display": "0.618",
+        "year": 2023
+      }
+    },
+    "co2": {
+      "Argentina": {
+        "value": 4.0771327,
+        "display": "4.1 t",
+        "year": 2023
+      },
+      "France": {
+        "value": 6.1314254,
+        "display": "6.1 t",
+        "year": 2023
+      },
+      "Spain": {
+        "value": 5.439509,
+        "display": "5.4 t",
+        "year": 2023
+      },
+      "Brazil": {
+        "value": 2.2259502,
+        "display": "2.2 t",
+        "year": 2023
+      },
+      "England": {
+        "value": 7.092003,
+        "display": "7.1 t",
+        "year": 2023
+      },
+      "Germany": {
+        "value": 9.089263,
+        "display": "9.1 t",
+        "year": 2023
+      },
+      "Portugal": {
+        "value": 4.5500045,
+        "display": "4.6 t",
+        "year": 2023
+      },
+      "Netherlands": {
+        "value": 8.298915,
+        "display": "8.3 t",
+        "year": 2023
+      },
+      "Belgium": {
+        "value": 16.78538,
+        "display": "16.8 t",
+        "year": 2023
+      },
+      "USA": {
+        "value": 15.813734,
+        "display": "15.8 t",
+        "year": 2023
+      },
+      "Uruguay": {
+        "value": 3.1822698,
+        "display": "3.2 t",
+        "year": 2023
+      },
+      "Croatia": {
+        "value": 6.0860047,
+        "display": "6.1 t",
+        "year": 2023
+      },
+      "Morocco": {
+        "value": 1.8538543,
+        "display": "1.9 t",
+        "year": 2023
+      },
+      "Colombia": {
+        "value": 1.9966097,
+        "display": "2.0 t",
+        "year": 2023
+      },
+      "Japan": {
+        "value": 9.184616,
+        "display": "9.2 t",
+        "year": 2023
+      },
+      "Senegal": {
+        "value": 1.0528344,
+        "display": "1.1 t",
+        "year": 2023
+      },
+      "Switzerland": {
+        "value": 13.339576,
+        "display": "13.3 t",
+        "year": 2023
+      },
+      "Mexico": {
+        "value": 4.3546333,
+        "display": "4.4 t",
+        "year": 2023
+      },
+      "Norway": {
+        "value": 7.0608263,
+        "display": "7.1 t",
+        "year": 2023
+      },
+      "Sweden": {
+        "value": 5.8495603,
+        "display": "5.8 t",
+        "year": 2023
+      },
+      "South Korea": {
+        "value": 13.698197,
+        "display": "13.7 t",
+        "year": 2023
+      },
+      "Ecuador": {
+        "value": 2.7195482,
+        "display": "2.7 t",
+        "year": 2023
+      },
+      "Canada": {
+        "value": 13.230393,
+        "display": "13.2 t",
+        "year": 2023
+      },
+      "Ivory Coast": {
+        "value": 0.5732141,
+        "display": "0.6 t",
+        "year": 2023
+      },
+      "Austria": {
+        "value": 8.375129,
+        "display": "8.4 t",
+        "year": 2023
+      },
+      "Turkey": {
+        "value": 5.534867,
+        "display": "5.5 t",
+        "year": 2023
+      },
+      "Egypt": {
+        "value": 2.2126539,
+        "display": "2.2 t",
+        "year": 2023
+      },
+      "Australia": {
+        "value": 14.069397,
+        "display": "14.1 t",
+        "year": 2023
+      },
+      "Paraguay": {
+        "value": 1.9176887,
+        "display": "1.9 t",
+        "year": 2023
+      },
+      "Iran": {
+        "value": 7.3787613,
+        "display": "7.4 t",
+        "year": 2023
+      },
+      "Ghana": {
+        "value": 0.7805456,
+        "display": "0.8 t",
+        "year": 2023
+      },
+      "Czech Republic": {
+        "value": 9.25329,
+        "display": "9.3 t",
+        "year": 2023
+      },
+      "Scotland": {
+        "value": 7.092003,
+        "display": "7.1 t",
+        "year": 2023
+      },
+      "Tunisia": {
+        "value": 2.473592,
+        "display": "2.5 t",
+        "year": 2023
+      },
+      "Panama": {
+        "value": 4.3772473,
+        "display": "4.4 t",
+        "year": 2023
+      },
+      "Qatar": {
+        "value": 27.601795,
+        "display": "27.6 t",
+        "year": 2023
+      },
+      "Saudi Arabia": {
+        "value": 19.663857,
+        "display": "19.7 t",
+        "year": 2023
+      },
+      "South Africa": {
+        "value": 5.1474295,
+        "display": "5.1 t",
+        "year": 2023
+      },
+      "Jordan": {
+        "value": 2.7813537,
+        "display": "2.8 t",
+        "year": 2023
+      },
+      "New Zealand": {
+        "value": 8.002548,
+        "display": "8.0 t",
+        "year": 2023
+      }
+    },
+    "debt": {
+      "France": {
+        "value": 95.46,
+        "display": "95% GDP",
+        "year": 2023
+      },
+      "Spain": {
+        "value": 95.82,
+        "display": "96% GDP",
+        "year": 2023
+      },
+      "Brazil": {
+        "value": 68.22,
+        "display": "68% GDP",
+        "year": 2023
+      },
+      "England": {
+        "value": 103.74,
+        "display": "104% GDP",
+        "year": 2023
+      },
+      "Germany": {
+        "value": 44.36,
+        "display": "44% GDP",
+        "year": 2023
+      },
+      "Portugal": {
+        "value": 103.91,
+        "display": "104% GDP",
+        "year": 2023
+      },
+      "Netherlands": {
+        "value": 46.66,
+        "display": "47% GDP",
+        "year": 2023
+      },
+      "Belgium": {
+        "value": 85.28,
+        "display": "85% GDP",
+        "year": 2023
+      },
+      "USA": {
+        "value": 107.04,
+        "display": "107% GDP",
+        "year": 2023
+      },
+      "Croatia": {
+        "value": 60.1,
+        "display": "60% GDP",
+        "year": 2023
+      },
+      "Senegal": {
+        "value": 75.11,
+        "display": "75% GDP",
+        "year": 2023
+      },
+      "Switzerland": {
+        "value": 14.04,
+        "display": "14% GDP",
+        "year": 2023
+      },
+      "Mexico": {
+        "value": 39.86,
+        "display": "40% GDP",
+        "year": 2023
+      },
+      "Norway": {
+        "value": 29.68,
+        "display": "30% GDP",
+        "year": 2023
+      },
+      "Sweden": {
+        "value": 19.05,
+        "display": "19% GDP",
+        "year": 2023
+      },
+      "South Korea": {
+        "value": 44.55,
+        "display": "45% GDP",
+        "year": 2022
+      },
+      "Canada": {
+        "value": 46.61,
+        "display": "47% GDP",
+        "year": 2023
+      },
+      "Austria": {
+        "value": 73.78,
+        "display": "74% GDP",
+        "year": 2023
+      },
+      "Turkey": {
+        "value": 30.55,
+        "display": "31% GDP",
+        "year": 2023
+      },
+      "Australia": {
+        "value": 35.39,
+        "display": "35% GDP",
+        "year": 2023
+      },
+      "Czech Republic": {
+        "value": 44,
+        "display": "44% GDP",
+        "year": 2023
+      },
+      "Scotland": {
+        "value": 103.74,
+        "display": "104% GDP",
+        "year": 2023
+      },
+      "South Africa": {
+        "value": 71.78,
+        "display": "72% GDP",
+        "year": 2023
+      }
+    },
+    "military": {
+      "Argentina": {
+        "value": 0.5631741,
+        "display": "0.6% GDP",
+        "year": 2025
+      },
+      "France": {
+        "value": 2.0266297,
+        "display": "2.0% GDP",
+        "year": 2025
+      },
+      "Spain": {
+        "value": 2.128921,
+        "display": "2.1% GDP",
+        "year": 2025
+      },
+      "Brazil": {
+        "value": 1.0544932,
+        "display": "1.1% GDP",
+        "year": 2025
+      },
+      "England": {
+        "value": 2.353264,
+        "display": "2.4% GDP",
+        "year": 2025
+      },
+      "Germany": {
+        "value": 2.2685108,
+        "display": "2.3% GDP",
+        "year": 2025
+      },
+      "Portugal": {
+        "value": 1.7112082,
+        "display": "1.7% GDP",
+        "year": 2025
+      },
+      "Netherlands": {
+        "value": 2.1945446,
+        "display": "2.2% GDP",
+        "year": 2025
+      },
+      "Belgium": {
+        "value": 2.008894,
+        "display": "2.0% GDP",
+        "year": 2025
+      },
+      "USA": {
+        "value": 3.1173081,
+        "display": "3.1% GDP",
+        "year": 2025
+      },
+      "Uruguay": {
+        "value": 2.284444,
+        "display": "2.3% GDP",
+        "year": 2025
+      },
+      "Croatia": {
+        "value": 2.0185585,
+        "display": "2.0% GDP",
+        "year": 2025
+      },
+      "Morocco": {
+        "value": 3.5431054,
+        "display": "3.5% GDP",
+        "year": 2025
+      },
+      "Colombia": {
+        "value": 3.202105,
+        "display": "3.2% GDP",
+        "year": 2025
+      },
+      "Japan": {
+        "value": 1.41167,
+        "display": "1.4% GDP",
+        "year": 2025
+      },
+      "Senegal": {
+        "value": 1.5554365,
+        "display": "1.6% GDP",
+        "year": 2025
+      },
+      "Switzerland": {
+        "value": 0.75692457,
+        "display": "0.8% GDP",
+        "year": 2025
+      },
+      "Mexico": {
+        "value": 0.7368095,
+        "display": "0.7% GDP",
+        "year": 2025
+      },
+      "Norway": {
+        "value": 3.2784815,
+        "display": "3.3% GDP",
+        "year": 2025
+      },
+      "Sweden": {
+        "value": 2.471185,
+        "display": "2.5% GDP",
+        "year": 2025
+      },
+      "South Korea": {
+        "value": 2.601469,
+        "display": "2.6% GDP",
+        "year": 2025
+      },
+      "Ecuador": {
+        "value": 2.0957782,
+        "display": "2.1% GDP",
+        "year": 2025
+      },
+      "Canada": {
+        "value": 1.6274475,
+        "display": "1.6% GDP",
+        "year": 2025
+      },
+      "Ivory Coast": {
+        "value": 0.77487504,
+        "display": "0.8% GDP",
+        "year": 2025
+      },
+      "Austria": {
+        "value": 1.1006335,
+        "display": "1.1% GDP",
+        "year": 2025
+      },
+      "Turkey": {
+        "value": 1.9082522,
+        "display": "1.9% GDP",
+        "year": 2025
+      },
+      "Egypt": {
+        "value": 0.6055802,
+        "display": "0.6% GDP",
+        "year": 2025
+      },
+      "Australia": {
+        "value": 1.9178731,
+        "display": "1.9% GDP",
+        "year": 2025
+      },
+      "Paraguay": {
+        "value": 0.87559426,
+        "display": "0.9% GDP",
+        "year": 2025
+      },
+      "Iran": {
+        "value": 2.0915792,
+        "display": "2.1% GDP",
+        "year": 2025
+      },
+      "Ghana": {
+        "value": 0.4768162,
+        "display": "0.5% GDP",
+        "year": 2025
+      },
+      "Czech Republic": {
+        "value": 1.835647,
+        "display": "1.8% GDP",
+        "year": 2025
+      },
+      "Algeria": {
+        "value": 8.830626,
+        "display": "8.8% GDP",
+        "year": 2025
+      },
+      "Scotland": {
+        "value": 2.353264,
+        "display": "2.4% GDP",
+        "year": 2025
+      },
+      "Bosnia & Herzegovina": {
+        "value": 0.7283303,
+        "display": "0.7% GDP",
+        "year": 2025
+      },
+      "Tunisia": {
+        "value": 2.4949613,
+        "display": "2.5% GDP",
+        "year": 2025
+      },
+      "DR Congo": {
+        "value": 1.3751452,
+        "display": "1.4% GDP",
+        "year": 2025
+      },
+      "Panama": {
+        "value": 0,
+        "display": "0.0% GDP",
+        "year": 2025
+      },
+      "Qatar": {
+        "value": 6.5002055,
+        "display": "6.5% GDP",
+        "year": 2022
+      },
+      "Saudi Arabia": {
+        "value": 6.4823203,
+        "display": "6.5% GDP",
+        "year": 2025
+      },
+      "South Africa": {
+        "value": 0.737352,
+        "display": "0.7% GDP",
+        "year": 2025
+      },
+      "Uzbekistan": {
+        "value": 2.4902494,
+        "display": "2.5% GDP",
+        "year": 2018
+      },
+      "Iraq": {
+        "value": 2.4473493,
+        "display": "2.4% GDP",
+        "year": 2025
+      },
+      "Jordan": {
+        "value": 4.55681,
+        "display": "4.6% GDP",
+        "year": 2025
+      },
+      "Cape Verde": {
+        "value": 0.6575159,
+        "display": "0.7% GDP",
+        "year": 2025
+      },
+      "New Zealand": {
+        "value": 1.1022496,
+        "display": "1.1% GDP",
+        "year": 2025
+      },
+      "Haiti": {
+        "value": 0.12116192,
+        "display": "0.1% GDP",
+        "year": 2025
+      }
+    },
+    "population": {
+      "Argentina": {
+        "value": 45538402,
+        "display": "45,538,402",
+        "year": 2023
+      },
+      "France": {
+        "value": 66438828,
+        "display": "66,438,828",
+        "year": 2023
+      },
+      "Spain": {
+        "value": 47911583,
+        "display": "47,911,583",
+        "year": 2023
+      },
+      "Brazil": {
+        "value": 211140731,
+        "display": "211,140,731",
+        "year": 2023
+      },
+      "England": {
+        "value": 68682965,
+        "display": "68,682,965",
+        "year": 2023
+      },
+      "Germany": {
+        "value": 84548233,
+        "display": "84,548,233",
+        "year": 2023
+      },
+      "Portugal": {
+        "value": 10430735,
+        "display": "10,430,735",
+        "year": 2023
+      },
+      "Netherlands": {
+        "value": 18092526,
+        "display": "18,092,526",
+        "year": 2023
+      },
+      "Belgium": {
+        "value": 11712891,
+        "display": "11,712,891",
+        "year": 2023
+      },
+      "USA": {
+        "value": 343477330,
+        "display": "343,477,330",
+        "year": 2023
+      },
+      "Uruguay": {
+        "value": 3388083,
+        "display": "3,388,083",
+        "year": 2023
+      },
+      "Croatia": {
+        "value": 3896023,
+        "display": "3,896,023",
+        "year": 2023
+      },
+      "Morocco": {
+        "value": 37712516,
+        "display": "37,712,516",
+        "year": 2023
+      },
+      "Colombia": {
+        "value": 52321152,
+        "display": "52,321,152",
+        "year": 2023
+      },
+      "Japan": {
+        "value": 124370947,
+        "display": "124,370,947",
+        "year": 2023
+      },
+      "Senegal": {
+        "value": 18077573,
+        "display": "18,077,573",
+        "year": 2023
+      },
+      "Switzerland": {
+        "value": 8870564,
+        "display": "8,870,564",
+        "year": 2023
+      },
+      "Mexico": {
+        "value": 129739761,
+        "display": "129,739,761",
+        "year": 2023
+      },
+      "Norway": {
+        "value": 5519167,
+        "display": "5,519,167",
+        "year": 2023
+      },
+      "Sweden": {
+        "value": 10551493,
+        "display": "10,551,493",
+        "year": 2023
+      },
+      "South Korea": {
+        "value": 51748744,
+        "display": "51,748,744",
+        "year": 2023
+      },
+      "Ecuador": {
+        "value": 17980079,
+        "display": "17,980,079",
+        "year": 2023
+      },
+      "Canada": {
+        "value": 39299098,
+        "display": "39,299,098",
+        "year": 2023
+      },
+      "Ivory Coast": {
+        "value": 31165653,
+        "display": "31,165,653",
+        "year": 2023
+      },
+      "Austria": {
+        "value": 9130434,
+        "display": "9,130,434",
+        "year": 2023
+      },
+      "Turkey": {
+        "value": 87270502,
+        "display": "87,270,502",
+        "year": 2023
+      },
+      "Egypt": {
+        "value": 114535772,
+        "display": "114,535,772",
+        "year": 2023
+      },
+      "Australia": {
+        "value": 26451126,
+        "display": "26,451,126",
+        "year": 2023
+      },
+      "Paraguay": {
+        "value": 6844150,
+        "display": "6,844,150",
+        "year": 2023
+      },
+      "Iran": {
+        "value": 90608708,
+        "display": "90,608,708",
+        "year": 2023
+      },
+      "Ghana": {
+        "value": 33787916,
+        "display": "33,787,916",
+        "year": 2023
+      },
+      "Czech Republic": {
+        "value": 10809722,
+        "display": "10,809,722",
+        "year": 2023
+      },
+      "Algeria": {
+        "value": 46164222,
+        "display": "46,164,222",
+        "year": 2023
+      },
+      "Scotland": {
+        "value": 68682965,
+        "display": "68,682,965",
+        "year": 2023
+      },
+      "Bosnia & Herzegovina": {
+        "value": 3185072,
+        "display": "3,185,072",
+        "year": 2023
+      },
+      "Tunisia": {
+        "value": 12200434,
+        "display": "12,200,434",
+        "year": 2023
+      },
+      "DR Congo": {
+        "value": 105789733,
+        "display": "105,789,733",
+        "year": 2023
+      },
+      "Panama": {
+        "value": 4458758,
+        "display": "4,458,758",
+        "year": 2023
+      },
+      "Qatar": {
+        "value": 2979086,
+        "display": "2,979,086",
+        "year": 2023
+      },
+      "Saudi Arabia": {
+        "value": 33264289,
+        "display": "33,264,289",
+        "year": 2023
+      },
+      "South Africa": {
+        "value": 63212386,
+        "display": "63,212,386",
+        "year": 2023
+      },
+      "Uzbekistan": {
+        "value": 35652311,
+        "display": "35,652,311",
+        "year": 2023
+      },
+      "Iraq": {
+        "value": 45074055,
+        "display": "45,074,055",
+        "year": 2023
+      },
+      "Jordan": {
+        "value": 11439220,
+        "display": "11,439,220",
+        "year": 2023
+      },
+      "Cape Verde": {
+        "value": 522335,
+        "display": "522,335",
+        "year": 2023
+      },
+      "New Zealand": {
+        "value": 5172837,
+        "display": "5,172,837",
+        "year": 2023
+      },
+      "Haiti": {
+        "value": 11637402,
+        "display": "11,637,402",
+        "year": 2023
+      },
+      "Curaçao": {
+        "value": 185437,
+        "display": "185,437",
+        "year": 2023
+      }
+    }
+  }
+}

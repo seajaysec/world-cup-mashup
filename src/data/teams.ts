@@ -1,85 +1,100 @@
 import type { TeamMeta, Tier } from '../types'
 
 /**
- * Metadata for all 48 teams in the 2026 World Cup.
+ * The 48 World Cup 2026 teams. `name` MUST match the openfootball feed spelling,
+ * and `group` is taken from the feed.
  *
- * `name` MUST match the spelling used in the openfootball feed exactly, otherwise
- * the team's matches won't be found. Groups are taken straight from the feed.
- *
- * `tier` is a curated, pre-tournament estimate of how favored each team is. It is
- * intentionally subjective and is the one thing you may want to hand-tune — edit
- * the values below; nothing else depends on them being "correct".
+ * The fourth value is a curated, pre-tournament **title-win odds** in percent —
+ * a deliberately subjective guess at how favored each team is to win it all. It's
+ * the single source of truth for favoredness: the tier (Favorite / Contender /
+ * Dark horse / Long shot) is derived from it via the bands in `tierForOdds`.
+ * Tune the numbers to taste; nothing breaks if they don't sum to exactly 100.
  */
-export const TEAMS: readonly TeamMeta[] = [
-  { name: 'Argentina', flag: '🇦🇷', group: 'Group J', tier: 'favorite' },
-  { name: 'France', flag: '🇫🇷', group: 'Group I', tier: 'favorite' },
-  { name: 'Spain', flag: '🇪🇸', group: 'Group H', tier: 'favorite' },
-  { name: 'Brazil', flag: '🇧🇷', group: 'Group C', tier: 'favorite' },
-  { name: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', group: 'Group L', tier: 'favorite' },
-  { name: 'Germany', flag: '🇩🇪', group: 'Group E', tier: 'favorite' },
-  { name: 'Portugal', flag: '🇵🇹', group: 'Group K', tier: 'favorite' },
+const RAW: [name: string, flag: string, group: string, odds: number][] = [
+  ['Argentina', '🇦🇷', 'Group J', 14],
+  ['France', '🇫🇷', 'Group I', 13],
+  ['Spain', '🇪🇸', 'Group H', 11],
+  ['Brazil', '🇧🇷', 'Group C', 11],
+  ['England', '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'Group L', 8],
+  ['Germany', '🇩🇪', 'Group E', 6],
+  ['Portugal', '🇵🇹', 'Group K', 5],
 
-  { name: 'Netherlands', flag: '🇳🇱', group: 'Group F', tier: 'contender' },
-  { name: 'Belgium', flag: '🇧🇪', group: 'Group G', tier: 'contender' },
-  { name: 'Uruguay', flag: '🇺🇾', group: 'Group H', tier: 'contender' },
-  { name: 'Croatia', flag: '🇭🇷', group: 'Group L', tier: 'contender' },
-  { name: 'Morocco', flag: '🇲🇦', group: 'Group C', tier: 'contender' },
-  { name: 'USA', flag: '🇺🇸', group: 'Group D', tier: 'contender' },
-  { name: 'Colombia', flag: '🇨🇴', group: 'Group K', tier: 'contender' },
-  { name: 'Japan', flag: '🇯🇵', group: 'Group F', tier: 'contender' },
-  { name: 'Senegal', flag: '🇸🇳', group: 'Group I', tier: 'contender' },
+  ['Netherlands', '🇳🇱', 'Group F', 4],
+  ['Belgium', '🇧🇪', 'Group G', 3],
+  ['USA', '🇺🇸', 'Group D', 2.5],
+  ['Uruguay', '🇺🇾', 'Group H', 2.5],
+  ['Croatia', '🇭🇷', 'Group L', 2.5],
+  ['Morocco', '🇲🇦', 'Group C', 2],
+  ['Colombia', '🇨🇴', 'Group K', 2],
+  ['Japan', '🇯🇵', 'Group F', 2],
+  ['Senegal', '🇸🇳', 'Group I', 2],
 
-  { name: 'Switzerland', flag: '🇨🇭', group: 'Group B', tier: 'darkhorse' },
-  { name: 'Mexico', flag: '🇲🇽', group: 'Group A', tier: 'darkhorse' },
-  { name: 'South Korea', flag: '🇰🇷', group: 'Group A', tier: 'darkhorse' },
-  { name: 'Ecuador', flag: '🇪🇨', group: 'Group E', tier: 'darkhorse' },
-  { name: 'Norway', flag: '🇳🇴', group: 'Group I', tier: 'darkhorse' },
-  { name: 'Ivory Coast', flag: '🇨🇮', group: 'Group E', tier: 'darkhorse' },
-  { name: 'Sweden', flag: '🇸🇪', group: 'Group F', tier: 'darkhorse' },
-  { name: 'Austria', flag: '🇦🇹', group: 'Group J', tier: 'darkhorse' },
-  { name: 'Turkey', flag: '🇹🇷', group: 'Group D', tier: 'darkhorse' },
-  { name: 'Egypt', flag: '🇪🇬', group: 'Group G', tier: 'darkhorse' },
-  { name: 'Canada', flag: '🇨🇦', group: 'Group B', tier: 'darkhorse' },
-  { name: 'Australia', flag: '🇦🇺', group: 'Group D', tier: 'darkhorse' },
-  { name: 'Paraguay', flag: '🇵🇾', group: 'Group D', tier: 'darkhorse' },
+  ['Switzerland', '🇨🇭', 'Group B', 1.5],
+  ['Mexico', '🇲🇽', 'Group A', 1.5],
+  ['Norway', '🇳🇴', 'Group I', 1.2],
+  ['Sweden', '🇸🇪', 'Group F', 1],
+  ['South Korea', '🇰🇷', 'Group A', 1],
+  ['Ecuador', '🇪🇨', 'Group E', 1],
+  ['Canada', '🇨🇦', 'Group B', 1],
+  ['Ivory Coast', '🇨🇮', 'Group E', 0.8],
+  ['Austria', '🇦🇹', 'Group J', 0.8],
+  ['Turkey', '🇹🇷', 'Group D', 0.8],
+  ['Egypt', '🇪🇬', 'Group G', 0.8],
+  ['Australia', '🇦🇺', 'Group D', 0.7],
+  ['Paraguay', '🇵🇾', 'Group D', 0.6],
 
-  { name: 'Iran', flag: '🇮🇷', group: 'Group G', tier: 'longshot' },
-  { name: 'Ghana', flag: '🇬🇭', group: 'Group L', tier: 'longshot' },
-  { name: 'Algeria', flag: '🇩🇿', group: 'Group J', tier: 'longshot' },
-  { name: 'Scotland', flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', group: 'Group C', tier: 'longshot' },
-  { name: 'Panama', flag: '🇵🇦', group: 'Group L', tier: 'longshot' },
-  { name: 'Bosnia & Herzegovina', flag: '🇧🇦', group: 'Group B', tier: 'longshot' },
-  { name: 'Czech Republic', flag: '🇨🇿', group: 'Group A', tier: 'longshot' },
-  { name: 'Qatar', flag: '🇶🇦', group: 'Group B', tier: 'longshot' },
-  { name: 'Saudi Arabia', flag: '🇸🇦', group: 'Group H', tier: 'longshot' },
-  { name: 'Tunisia', flag: '🇹🇳', group: 'Group F', tier: 'longshot' },
-  { name: 'South Africa', flag: '🇿🇦', group: 'Group A', tier: 'longshot' },
-  { name: 'Uzbekistan', flag: '🇺🇿', group: 'Group K', tier: 'longshot' },
-  { name: 'Iraq', flag: '🇮🇶', group: 'Group I', tier: 'longshot' },
-  { name: 'Jordan', flag: '🇯🇴', group: 'Group J', tier: 'longshot' },
-  { name: 'Haiti', flag: '🇭🇹', group: 'Group C', tier: 'longshot' },
-  { name: 'DR Congo', flag: '🇨🇩', group: 'Group K', tier: 'longshot' },
-  { name: 'Curaçao', flag: '🇨🇼', group: 'Group E', tier: 'longshot' },
-  { name: 'Cape Verde', flag: '🇨🇻', group: 'Group H', tier: 'longshot' },
-  { name: 'New Zealand', flag: '🇳🇿', group: 'Group G', tier: 'longshot' },
+  ['Iran', '🇮🇷', 'Group G', 0.4],
+  ['Ghana', '🇬🇭', 'Group L', 0.4],
+  ['Czech Republic', '🇨🇿', 'Group A', 0.4],
+  ['Algeria', '🇩🇿', 'Group J', 0.3],
+  ['Scotland', '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'Group C', 0.3],
+  ['Bosnia & Herzegovina', '🇧🇦', 'Group B', 0.3],
+  ['Tunisia', '🇹🇳', 'Group F', 0.3],
+  ['DR Congo', '🇨🇩', 'Group K', 0.3],
+  ['Panama', '🇵🇦', 'Group L', 0.2],
+  ['Qatar', '🇶🇦', 'Group B', 0.2],
+  ['Saudi Arabia', '🇸🇦', 'Group H', 0.2],
+  ['South Africa', '🇿🇦', 'Group A', 0.2],
+  ['Uzbekistan', '🇺🇿', 'Group K', 0.2],
+  ['Iraq', '🇮🇶', 'Group I', 0.2],
+  ['Jordan', '🇯🇴', 'Group J', 0.2],
+  ['Cape Verde', '🇨🇻', 'Group H', 0.2],
+  ['New Zealand', '🇳🇿', 'Group G', 0.2],
+  ['Haiti', '🇭🇹', 'Group C', 0.1],
+  ['Curaçao', '🇨🇼', 'Group E', 0.1],
 ]
 
-/**
- * Maps the names the family wrote on their picks to the canonical feed spelling.
- * Only needed where the two differ.
- */
+/** Favoredness bands. Lower bound in percent; this is what "quantifies" a tier. */
+export const TIER_BANDS: { tier: Tier; min: number }[] = [
+  { tier: 'favorite', min: 5 },
+  { tier: 'contender', min: 2 },
+  { tier: 'darkhorse', min: 0.6 },
+  { tier: 'longshot', min: 0 },
+]
+
+export function tierForOdds(odds: number): Tier {
+  return (TIER_BANDS.find((b) => odds >= b.min) ?? TIER_BANDS[TIER_BANDS.length - 1]).tier
+}
+
+export const TEAMS: readonly TeamMeta[] = RAW.map(([name, flag, group, odds]) => ({
+  name,
+  flag,
+  group,
+  odds,
+  tier: tierForOdds(odds),
+}))
+
+/** Maps roster spellings to the canonical feed spelling where they differ. */
 const TEAM_ALIASES: Record<string, string> = {
   'Congo DR': 'DR Congo',
 }
 
 const TEAMS_BY_NAME = new Map(TEAMS.map((t) => [t.name, t]))
 
-/** Resolve any spelling (roster or feed) to the canonical feed name. */
 export function canonicalTeamName(name: string): string {
   return TEAM_ALIASES[name] ?? name
 }
 
-/** Look up metadata by any spelling. Returns undefined for non-WC (joke) teams. */
 export function getTeamMeta(name: string): TeamMeta | undefined {
   return TEAMS_BY_NAME.get(canonicalTeamName(name))
 }
@@ -91,10 +106,24 @@ export const TIER_LABELS: Record<Tier, string> = {
   longshot: 'Long shot',
 }
 
+/** Human-readable odds band per tier, for a legend ("Favorite = ≥5% to win it all"). */
+export const TIER_RANGE_LABELS: Record<Tier, string> = {
+  favorite: '≥5%',
+  contender: '2–5%',
+  darkhorse: '0.6–2%',
+  longshot: '<0.6%',
+}
+
 /** Lower = more favored; used as a final leaderboard tiebreaker. */
 export const TIER_RANK: Record<Tier, number> = {
   favorite: 0,
   contender: 1,
   darkhorse: 2,
   longshot: 3,
+}
+
+/** "14%", "2.5%", "0.4%" — trims trailing zeros sensibly. */
+export function formatOdds(odds: number): string {
+  const text = odds >= 1 && Number.isInteger(odds) ? String(odds) : odds.toFixed(1)
+  return `${text}%`
 }

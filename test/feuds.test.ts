@@ -15,7 +15,14 @@ const spoons = computeSpoons(ROSTER, progress)
 
 describe('computeFeuds (family body count)', () => {
   it('counts every decisive family-vs-family result', () => {
-    expect(feuds.feed).toHaveLength(8)
+    expect(feuds.feed).toHaveLength(9)
+  })
+
+  it('counts David beating FK’s Austria (Argentina 2–0)', () => {
+    const d = feuds.feed.find((f) => f.loserMember === 'FK')
+    expect(d).toBeDefined()
+    expect(d!.winnerMember).toBe('David')
+    expect(d!.loserTeam).toBe('Austria')
   })
 
   it('credits a defeat to whoever owned the team that day (Aaron via Curaçao)', () => {
@@ -36,7 +43,7 @@ describe('computeFeuds (family body count)', () => {
     const claire = feuds.records.find((r) => r.member === 'Claire')
     expect(claire?.losses.length).toBe(2) // beaten by Egypt and Belgium
     const totalWins = feuds.records.reduce((s, r) => s + r.wins.length, 0)
-    expect(totalWins).toBe(8)
+    expect(totalWins).toBe(9)
   })
 })
 

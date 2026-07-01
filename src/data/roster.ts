@@ -50,4 +50,5 @@ export const ROSTER: readonly RosterEntry[] = [
   },
   { member: 'Eli', team: 'Colombia', flag: '🇨🇴' },
   { member: 'Jon', team: 'Uruguay', flag: '🇺🇾' },
+  { member: 'FK', team: 'Austria', flag: '🇦🇹' },
 ]

@@ -970,6 +970,9 @@
 .feudLosses {
   color: var(--color-out);
 }
+.feudDefeats {
+  color: var(--color-text-muted);
+}
 .feudSpoons {
   color: var(--color-accent);
 }

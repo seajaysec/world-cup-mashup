@@ -11,6 +11,9 @@ function shortDate(date: string): string {
 interface Row {
   member: string
   kills: Defeat[]
+  /** Group-stage beatings by a family member (they survived). Knockout defeats
+   * aren't here — those are eliminations, shown under 💀 with who did it. */
+  defeats: Defeat[]
   knockouts: number
   deadTeams: DeadTeam[]
 }
@@ -76,22 +79,29 @@ export function FeudsView({
   const ensure = (member: string): Row => {
     let r = rows.get(member)
     if (!r) {
-      r = { member, kills: [], knockouts: 0, deadTeams: [] }
+      r = { member, kills: [], defeats: [], knockouts: 0, deadTeams: [] }
       rows.set(member, r)
     }
     return r
   }
-  for (const rec of feuds.records) ensure(rec.member).kills = rec.wins
+  for (const rec of feuds.records) {
+    const r = ensure(rec.member)
+    r.kills = rec.wins
+    // Group-stage losses to family — the other side of someone's kill. Knockout
+    // losses are eliminations, shown under 💀, so we don't repeat them here.
+    r.defeats = rec.losses.filter((l) => Boolean(l.group))
+  }
   for (const s of spoons) {
     const r = ensure(s.member)
     r.knockouts = s.count
     r.deadTeams = s.deadTeams
   }
 
-  // Only members who've scored a kill or been knocked out are "in the body
-  // count". Ranked by kills (desc); getting knocked out drags you down.
+  // Anyone who's touched a feud — dealt a kill, been beaten by family, or been
+  // knocked out — gets a card. Ranked by kills (desc); getting knocked out drags
+  // you down.
   const list = [...rows.values()]
-    .filter((r) => r.kills.length > 0 || r.knockouts > 0)
+    .filter((r) => r.kills.length > 0 || r.defeats.length > 0 || r.knockouts > 0)
     .sort(
       (a, b) =>
         b.kills.length - a.kills.length ||
@@ -110,9 +120,10 @@ export function FeudsView({
       <p className={styles.muted} style={{ marginTop: 0, fontSize: '0.85rem' }}>
         ⚔️ A <strong>kill</strong> is your team beating another family member&apos;s team — credited
         to whoever owned it <em>that day</em>, so re-picks are fair (a penalty-shootout win counts).
-        💀 A <strong>knock-out</strong> is one of your teams going out, by anyone — that&apos;s your
-        loss in the pick&apos;em, and the most knock-outs is the 🥄 biggest loser. (A family member
-        you beat shows up as your kill, on your card.)
+        🩸 A <strong>defeat</strong> is the other side of that — a family member beat you in the
+        group stage, but you lived on. 💀 A <strong>knock-out</strong> is one of your teams going
+        out, by anyone — that&apos;s your loss in the pick&apos;em, and the most knock-outs is the 🥄
+        biggest loser.
       </p>
 
       {list.length === 0 ? (
@@ -135,6 +146,7 @@ export function FeudsView({
                   </span>
                   <span className={styles.feudTally}>
                     <span className={styles.feudWins}>⚔️ {r.kills.length}</span>
+                    <span className={styles.feudDefeats}>🩸 {r.defeats.length}</span>
                     <span className={styles.feudLosses}>💀 {r.knockouts}</span>
                   </span>
                 </div>
@@ -156,6 +168,32 @@ export function FeudsView({
                             pens={d.pens}
                           />
                           <span className={styles.feudWhen}> · {d.group ?? d.round} · {shortDate(d.date)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {r.defeats.length > 0 && (
+                  <div className={styles.feudSection}>
+                    <div className={styles.feudSub}>🩸 Beaten by family</div>
+                    <ul className={styles.feudLines}>
+                      {r.defeats.map((d, i) => (
+                        <li key={i}>
+                          lost to <strong>{d.winnerMember}</strong> ·{' '}
+                          <ScoreLine
+                            leftFlag={d.loserFlag}
+                            leftTeam={d.loserTeam}
+                            scoreLeft={d.scoreLoser}
+                            scoreRight={d.scoreWinner}
+                            rightTeam={d.winnerTeam}
+                            rightFlag={d.winnerFlag}
+                            pens={d.pens}
+                          />
+                          <span className={styles.feudWhen}>
+                            {' '}
+                            · {d.group ?? d.round} · {shortDate(d.date)}
+                          </span>
                         </li>
                       ))}
                     </ul>

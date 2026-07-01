@@ -25,6 +25,14 @@ describe('computeFeuds (family body count)', () => {
     expect(d!.loserTeam).toBe('Austria')
   })
 
+  it('keeps the loser side of a feud on their record (a group-stage defeat)', () => {
+    // FK only ever loses (Austria still alive) — the record must still carry it,
+    // as a group-stage loss, so the Feuds card can show "beaten by family".
+    const fk = feuds.records.find((r) => r.member === 'FK')
+    expect(fk?.wins.length).toBe(0)
+    expect(fk?.losses.some((l) => l.winnerMember === 'David' && Boolean(l.group))).toBe(true)
+  })
+
   it('credits a defeat to whoever owned the team that day (Aaron via Curaçao)', () => {
     const d = feuds.feed.find((f) => f.loserMember === 'Aaron')
     expect(d).toBeDefined()

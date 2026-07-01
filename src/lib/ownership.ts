@@ -31,11 +31,14 @@ export function buildOwnerResolver(roster: readonly RosterEntry[]): OwnerResolve
   }
   for (const entry of roster) {
     if (entry.joke) continue
-    // Former teams chain from -∞ through each one's `until`.
+    // Former teams chain from -∞ through each one's `until`. A former team may
+    // carry its own `since` too (picked late, then dropped) — that trims the
+    // span's start so its earlier games aren't back-credited either.
     let from = Number.NEGATIVE_INFINITY
     for (const f of entry.formerTeams ?? []) {
+      const spanFrom = f.since ? Math.max(from, dateMs(f.since)) : from
       const until = dateMs(f.until)
-      push(entry, f.team, from, until)
+      push(entry, f.team, spanFrom, until)
       from = until
     }
     // The current team starts at `since` when given — so a fresh pick of a team

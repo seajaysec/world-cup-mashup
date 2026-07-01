@@ -50,7 +50,7 @@ describe('derive ownership + joke wiring', () => {
   it('maps real teams to their owning member', () => {
     expect(d.ownerByTeam.get('France')?.member).toBe('Chris')
     expect(d.ownerByTeam.get('DR Congo')?.member).toBe('Preston') // via alias
-    expect(d.ownerByTeam.get('Ecuador')?.member).toBe('Harlan') // converted from a joke pick
+    expect(d.ownerByTeam.get('Australia')?.member).toBe('Harlan') // ex-joke pick, now re-picked
     expect(d.ownerByTeam.has('Galaxy')).toBe(false) // joke teams aren't owners of a WC team
   })
 

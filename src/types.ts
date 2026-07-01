@@ -45,11 +45,14 @@ export interface RosterEntry {
   /**
    * Teams this member previously held and gave up (after a knockout), oldest
    * first. `until` is the date they switched away (= the next team's `since`).
+   * `since` is optional and only needed when they *also* picked this team late
+   * (so its earlier games aren't back-credited) — e.g. a team picked mid-run and
+   * then dropped again; absent means they held it from the tournament's start.
    * When re-assigning someone, move their old team here with the switch date and
    * set `team`/`flag`/`since` to the new pick. Each former team is also a tally
    * mark in the wooden-spoon race.
    */
-  formerTeams?: { team: string; until: string }[]
+  formerTeams?: { team: string; since?: string; until: string }[]
 }
 
 /** Static metadata about a real World Cup team. */
